@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>it.andreacioni</groupId>
+  <artifactId>it.andreacioni.sdrive</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>sDrvie</name>
+  
+  <properties>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+  </properties>
+  
+  <dependencies>
+  	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+	<dependency>
+	    <groupId>org.apache.commons</groupId>
+	    <artifactId>commons-compress</artifactId>
+	    <version>1.14</version>
+	</dependency>
+  	
+  	<!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-drive -->
+	<dependency>
+	    <groupId>com.google.apis</groupId>
+	    <artifactId>google-api-services-drive</artifactId>
+	    <version>v3-rev76-1.22.0</version>
+	</dependency>
+  	
+  
+  </dependencies>
+</project>
