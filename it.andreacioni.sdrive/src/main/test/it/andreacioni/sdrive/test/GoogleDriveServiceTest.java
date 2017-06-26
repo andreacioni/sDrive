@@ -53,6 +53,7 @@ public class GoogleDriveServiceTest {
 
 		File f = new File(TEST_FILE);
 		f.createNewFile();
+		f.deleteOnExit();
 
 		assertEquals(f.getName(), TEST_FILE);
 
