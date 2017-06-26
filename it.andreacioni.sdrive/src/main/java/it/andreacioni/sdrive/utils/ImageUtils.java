@@ -6,9 +6,9 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 
 public class ImageUtils {
-	 //Obtain the image URL
+	//Obtain the image URL
     public static Image createImage(String path, String description) {
-        URL imageURL = ImageUtils.class.getResource(path);
+        URL imageURL = ResourceUtils.asUrl(path);
         
         if (imageURL == null) {
             System.err.println("Resource not found: " + path);
