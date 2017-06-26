@@ -10,6 +10,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -17,6 +21,7 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -33,19 +38,11 @@ public class GoogleDriveCloudService implements CloudServive {
 	/** Application name. */
 	private static final String APPLICATION_NAME = "Secure Drive";
 
-	private static final String APP_DATA_FOLDER = "appDataFolder";
-
 	private static final String ROOT_FOLDER = "root";
 
 	private static final String MIME_TYPE_DIR = "application/vnd.google-apps.folder";
 
-	private static final String SIMPLE_Q_FORMAT = "name = '%s' and trashed = false and '%s' in parents";
-
-	private static final String DIRECTORY_Q_FORMAT = "mimeType='" + MIME_TYPE_DIR
-			+ "' and name = '%s' and trashed = false and '%s' in parents";
-
-	private static final String FILE_Q_FORMAT = "mimeType!='" + MIME_TYPE_DIR
-			+ "' and name = '%s' and trashed = false and '%s' in parents";
+	private static final String SIMPLE_Q_FORMAT = "trashed = false and '%s' in parents";
 
 	/** Global instance of the {@link FileDataStoreFactory}. */
 	private static FileDataStoreFactory DATA_STORE_FACTORY;
@@ -64,6 +61,8 @@ public class GoogleDriveCloudService implements CloudServive {
 	 */
 	private static final List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE_FILE);
 
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
+
 	private Drive driveService;
 
 	private boolean connected = false;
@@ -73,8 +72,10 @@ public class GoogleDriveCloudService implements CloudServive {
 	public GoogleDriveCloudService() {
 	}
 
+	@Override
 	public boolean connect() throws IOException {
 		boolean ret = false;
+		LOG.debug("Connecting to Google Drive");
 		try {
 			HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 			DATA_STORE_FACTORY = new FileDataStoreFactory(SDrive.DATA_STORE_DIR);
@@ -83,21 +84,24 @@ public class GoogleDriveCloudService implements CloudServive {
 
 			accountName = getAccountName();
 
+			LOG.info("Account connected: " + accountName);
+
 			ret = connected = true;
 		} catch (Throwable t) {
-			t.printStackTrace();
+			LOG.debug("Exception on Google Drive", t);
 		}
 
 		return ret;
 	}
 
+	@Override
 	public String getAccountName() throws IOException {
 
 		if (accountName == null) {
 			try {
 				return driveService.about().get().setFields("user").execute().getUser().getEmailAddress();
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOG.debug("Exception on retrieving Google Drive account name", e);
 			}
 
 			return null;
@@ -107,77 +111,184 @@ public class GoogleDriveCloudService implements CloudServive {
 
 	}
 
+	@Override
 	public boolean isAccountConnected() throws IOException {
 		return connected;
 	}
 
-	public File download(String path) throws IOException {
+	@Override
+	public File download(String path, String toLocalPath) throws IOException {
+		LOG.info("Downloading file: {}, to directory: {}", path, toLocalPath);
 		File ret = null;
-		com.google.api.services.drive.model.File file = getFile(path);
-		if (file == null)
-			throw new IOException("Invalid path passed");
-		String fileId = file.getName();
-		OutputStream outputStream = new FileOutputStream(new File(path));
-		driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+
+		if (toLocalPath != null) {
+			File toFile = new File(toLocalPath);
+
+			if (!toFile.createNewFile())
+				LOG.warn("{} is already present, ovewriting it", toLocalPath);
+
+			if (toFile.canWrite()) {
+				com.google.api.services.drive.model.File file = getFile(path);
+				if (file != null) {
+					String fileId = file.getId();
+					LOG.debug("File Id: {}", fileId);
+					OutputStream outputStream = new FileOutputStream(toFile);
+
+					driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+
+					ret = toFile;
+				} else
+					LOG.error("Invalid file to download");
+			} else {
+				LOG.error("Cannot write to file");
+			}
+
+		} else
+			LOG.error("Invalid path string");
+
+		return ret;
+
+	}
+
+	@Override
+	public boolean upload(File file, String destPath) throws IOException {
+		LOG.info("Uploading file: {}", file.toString());
+		boolean ret = false;
+		com.google.api.services.drive.model.File parent = getDirectory(destPath);
+
+		if (file != null && file.exists() && destPath != null) {
+			com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
+
+			driveService.files().create(fileMetadata.setName(file.getName()).setParents(Arrays.asList(parent.getId())),
+					new FileContent(null, file)).execute();
+
+			ret = true;
+		} else
+			LOG.error("Invalid file to upload or destination path is not a valid directory");
 
 		return ret;
 	}
 
-	public boolean upload(File file) throws IOException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean createFolder(String path, String folderName) throws IOException {
-		boolean ret = true;
-
-		com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
-		fileMetadata.setName(folderName);
-		fileMetadata.setMimeType(MIME_TYPE_DIR);
-
-		driveService.files().create(fileMetadata).execute();
-
-		return ret;
-	}
-
+	@Override
 	public boolean fileExists(String path) throws IOException {
 		com.google.api.services.drive.model.File ret = getFile(path);
-		return (ret != null) && !isDirectory(ret);
+		return (ret != null);
 	}
 
+	@Override
 	public boolean directoryExists(String path) throws IOException {
-		com.google.api.services.drive.model.File ret = getFile(path);
-		return (ret != null) && isDirectory(ret);
+		com.google.api.services.drive.model.File ret = getDirectory(path);
+		return (ret != null);
 	}
 
-	public com.google.api.services.drive.model.File getFile(String path) throws IOException {
-		boolean flag = true;
-		com.google.api.services.drive.model.File ret = null;
-		String part[] = path.split("/");
-		List<com.google.api.services.drive.model.File> list = listFilesInFolder(ROOT_FOLDER);
+	@Override
+	public boolean createDirectory(String path, String folderName) throws IOException {
+		LOG.info("Creating folder: {}, in path: {}", folderName, path);
+		boolean ret = false;
+		com.google.api.services.drive.model.File parentDir = getDirectory(path);
+		if (parentDir != null) {
+			com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
 
-		for (int i = 0; (i < path.length()) && flag; i++) {
-			Iterator<com.google.api.services.drive.model.File> iterator = list.iterator();
-			ret = null;
-			flag = false;
-			while (iterator.hasNext() && !flag) {
-				com.google.api.services.drive.model.File f = iterator.next();
-				flag = f.getName().equals(part[i]);
-				if (flag) {
-					ret = f;
-					list = listFilesInFolder(f.getId());
-				}
-			}
-		}
+			driveService.files().create(fileMetadata.setName(folderName).setParents(Arrays.asList(parentDir.getId()))
+					.setMimeType(MIME_TYPE_DIR)).execute();
+
+			ret = true;
+		} else
+			LOG.error("Parent directory not found or it is a file");
 
 		return ret;
 	}
 
+	@Override
+	public boolean deleteDirectory(String path) throws IOException {
+		LOG.info("Deleting folder: {}", path);
+		boolean ret = false;
+		com.google.api.services.drive.model.File fDir = getDirectory(path);
+
+		if (fDir != null) {
+			driveService.files().delete(fDir.getId()).execute();
+
+			ret = true;
+		} else
+			LOG.error("Directory not found or it is a file");
+
+		return ret;
+	}
+
+	@Override
+	public boolean deleteFile(String path) throws IOException {
+		LOG.info("Deleting file: {}", path);
+		boolean ret = false;
+		com.google.api.services.drive.model.File fDir = getFile(path);
+
+		if (fDir != null) {
+			driveService.files().delete(fDir.getId()).execute();
+
+			ret = true;
+		} else
+			LOG.error("Directory not found or it is a file");
+
+		return ret;
+	}
+
+	@Override
 	public void disconnect() throws IOException {
 		if (connected) {
 			driveService = null;
 			connected = false;
 		}
+	}
+
+	private com.google.api.services.drive.model.File get(String path) throws IOException {
+		com.google.api.services.drive.model.File ret = null;
+
+		if (!path.equals("/")) {
+			String regex = Pattern.quote("/");
+			String part[] = Arrays.stream(path.split(regex)).filter((s) -> !s.isEmpty()).toArray(String[]::new);
+
+			LOG.debug("Splitted path: {},(regex: {})", Arrays.toString(part), regex);
+
+			List<com.google.api.services.drive.model.File> list = listFilesInFolder(ROOT_FOLDER);
+			Iterator<com.google.api.services.drive.model.File> iterator = list.iterator();
+			int i = 0;
+
+			LOG.debug("Path: {}, root: {}", path, list.toString());
+			while (iterator.hasNext() && (i < part.length)) {
+
+				LOG.debug("Searching for {} in: {}", part[i], list.toString());
+
+				com.google.api.services.drive.model.File f = iterator.next();
+
+				if (!f.getName().equals(part[i]))
+					return null;
+				else {
+					list = listFilesInFolder(f.getId());
+					iterator = list.iterator();
+					ret = f;
+					i++;
+				}
+
+			}
+		} else
+			ret = new com.google.api.services.drive.model.File().setId("root").setMimeType(MIME_TYPE_DIR);
+
+		return ret;
+	}
+
+	private com.google.api.services.drive.model.File getFile(String path) throws IOException {
+		com.google.api.services.drive.model.File ret = get(path);
+		if (ret != null && !isDirectory(ret))
+			return ret;
+		else
+			return null;
+	}
+
+	private com.google.api.services.drive.model.File getDirectory(String path) throws IOException {
+		com.google.api.services.drive.model.File ret = get(path);
+		if (ret != null && isDirectory(ret))
+			return ret;
+		else
+			return null;
 	}
 
 	private List<com.google.api.services.drive.model.File> listFilesInFolder(String rootFolder) throws IOException {
@@ -188,7 +299,7 @@ public class GoogleDriveCloudService implements CloudServive {
 		do {
 			result = driveService.files().list().setQ(String.format(SIMPLE_Q_FORMAT, rootFolder)).setSpaces("drive")
 					.setCorpora("user").setIncludeTeamDriveItems(false).setSupportsTeamDrives(false)
-					.setFields("nextPageToken, files(id, name)").setPageToken(pageToken).execute();
+					.setFields("nextPageToken, files(id, name, mimeType)").setPageToken(pageToken).execute();
 
 			if (result == null)
 				throw new IOException("Cannot retrieve result");

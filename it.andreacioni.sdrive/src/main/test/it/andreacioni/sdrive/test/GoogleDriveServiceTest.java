@@ -1,8 +1,10 @@
 package it.andreacioni.sdrive.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.After;
@@ -15,6 +17,10 @@ public class GoogleDriveServiceTest {
 
 	private GoogleDriveCloudService service;
 
+	private static final String TEST_NAME = "sDriveTest";
+	private static final String TEST_FILE = TEST_NAME + ".txt";
+	private static final String TEST_DIR = "/" + TEST_NAME;
+
 	@Before
 	public void init() {
 		service = new GoogleDriveCloudService();
@@ -22,32 +28,57 @@ public class GoogleDriveServiceTest {
 			service.connect();
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail();
 		}
 	}
 
 	@Test
-	public void testSearchFile() {
-		try {
-			assertTrue(service.fileExists("TODO.txt"));
+	public void testDir() throws IOException {
+		assertTrue(!service.directoryExists(TEST_DIR));
+		assertTrue(!service.fileExists(TEST_DIR));
 
-			assertTrue(!service.fileExists("TODO"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail();
-		}
+		assertTrue(service.createDirectory("/", TEST_NAME));
+
+		assertTrue(service.directoryExists(TEST_DIR));
+		assertTrue(!service.fileExists(TEST_DIR));
+
+		assertTrue(service.deleteDirectory(TEST_DIR));
+
+		assertTrue(!service.directoryExists(TEST_DIR));
+		assertTrue(!service.fileExists(TEST_DIR));
+
 	}
 
 	@Test
-	public void testSearchDir() {
-		try {
-			assertTrue(service.directoryExists("Personale"));
+	public void testFile() throws IOException {
 
-			assertTrue(!service.directoryExists("Person"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail();
-		}
+		File f = new File(TEST_FILE);
+		f.createNewFile();
+
+		assertEquals(f.getName(), TEST_FILE);
+
+		assertTrue(!service.directoryExists("/" + TEST_FILE));
+		assertTrue(!service.fileExists("/" + TEST_FILE));
+
+		assertTrue(service.upload(f, "/"));
+
+		f.delete();
+
+		f = service.download("/" + TEST_FILE, TEST_FILE);
+
+		assertTrue(f != null);
+
+		System.out.println(f.toString());
+
+		f.delete();
+
+		assertTrue(!service.directoryExists("/" + TEST_FILE));
+		assertTrue(service.fileExists("/" + TEST_FILE));
+
+		assertTrue(service.deleteFile("/" + TEST_FILE));
+
+		assertTrue(!service.directoryExists("/" + TEST_FILE));
+		assertTrue(!service.fileExists("/" + TEST_FILE));
+
 	}
 
 	@After
