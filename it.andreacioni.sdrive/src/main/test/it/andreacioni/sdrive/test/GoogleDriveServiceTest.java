@@ -32,6 +32,12 @@ public class GoogleDriveServiceTest {
 	}
 
 	@Test
+	public void testRoot() throws IOException {
+		assertTrue(service.directoryExists("/"));
+		assertTrue(!service.fileExists("/"));
+	}
+
+	@Test
 	public void testDir() throws IOException {
 		assertTrue(!service.directoryExists(TEST_DIR));
 		assertTrue(!service.fileExists(TEST_DIR));
@@ -62,15 +68,11 @@ public class GoogleDriveServiceTest {
 
 		assertTrue(service.upload(f, "/"));
 
-		f.delete();
+		assertTrue(f.delete());
 
 		f = service.download("/" + TEST_FILE, TEST_FILE);
 
-		assertTrue(f != null);
-
-		System.out.println(f.toString());
-
-		f.delete();
+		assertTrue(f != null && f.delete());
 
 		assertTrue(!service.directoryExists("/" + TEST_FILE));
 		assertTrue(service.fileExists("/" + TEST_FILE));
@@ -85,6 +87,8 @@ public class GoogleDriveServiceTest {
 	@After
 	public void close() {
 		try {
+			service.deleteDirectory(TEST_DIR);
+			service.deleteFile("/" + TEST_FILE);
 			service.disconnect();
 		} catch (IOException e) {
 			fail();

@@ -134,13 +134,18 @@ public class GoogleDriveCloudService implements CloudServive {
 					LOG.debug("File Id: {}", fileId);
 					OutputStream outputStream = new FileOutputStream(toFile);
 
-					driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+					driveService.files().get(fileId).executeMedia().download(outputStream);
+
+					outputStream.close();
 
 					ret = toFile;
-				} else
+				} else {
 					LOG.error("Invalid file to download");
+					toFile.delete();
+				}
 			} else {
 				LOG.error("Cannot write to file");
+				toFile.delete();
 			}
 
 		} else
@@ -171,12 +176,14 @@ public class GoogleDriveCloudService implements CloudServive {
 
 	@Override
 	public boolean fileExists(String path) throws IOException {
+		LOG.info("Checking file exists: {}", path);
 		com.google.api.services.drive.model.File ret = getFile(path);
 		return (ret != null);
 	}
 
 	@Override
 	public boolean directoryExists(String path) throws IOException {
+		LOG.info("Checking directory exists: {}", path);
 		com.google.api.services.drive.model.File ret = getDirectory(path);
 		return (ret != null);
 	}
