@@ -1,8 +1,11 @@
 package it.andreacioni.sdrive.archive;
 
+import java.io.File;
+import java.util.List;
+
 public interface ArchiveService {
 
-	// public File uncompress(File file, String psw);
+	public List<File> uncompress(File file, String key);
 
-	// public File compress(String psw, List<File> files);
+	public File compress(String key, List<File> files);
 }

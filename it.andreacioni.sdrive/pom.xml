@@ -11,11 +11,18 @@
   </properties>
   
   <dependencies>
-  	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+  	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress 
 	<dependency>
 	    <groupId>org.apache.commons</groupId>
 	    <artifactId>commons-compress</artifactId>
 	    <version>1.14</version>
+	</dependency>-->
+	
+	<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+	<dependency>
+	    <groupId>commons-io</groupId>
+	    <artifactId>commons-io</artifactId>
+	    <version>2.5</version>
 	</dependency>
   	
   	<!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-drive -->

@@ -137,6 +137,7 @@ public class GoogleDriveCloudService implements CloudServive {
 					// TODO not work .executeAndDownloadTo(outputStream);
 					driveService.files().get(fileId).executeMedia().download(outputStream);
 
+					outputStream.flush();
 					outputStream.close();
 
 					ret = toFile;
