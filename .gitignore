@@ -14,7 +14,7 @@
 *.jar
 *.war
 *.ear
-*.zip
+!test_decompres*.zip
 *.tar.gz
 *.rar
 

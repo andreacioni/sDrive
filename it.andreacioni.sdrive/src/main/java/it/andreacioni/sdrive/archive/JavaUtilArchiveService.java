@@ -47,6 +47,9 @@ public class JavaUtilArchiveService {
 						File of = new File(outFile.getAbsolutePath() + File.separator + e.getName());
 
 						LOG.debug("Uncompressing ZipEntry: {}", e.toString());
+						if (of.exists()) {
+							LOG.warn("Output file already exists");
+						}
 
 						if (e.isDirectory()) {
 							if (!of.mkdir())
