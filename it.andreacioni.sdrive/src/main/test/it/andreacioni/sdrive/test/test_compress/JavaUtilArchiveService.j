@@ -74,8 +74,6 @@ public class JavaUtilArchiveService {
 
 			for (File f : filesList) {
 				ret = compress(f, toFilePath, mergeIfExists, key);
-				if (ret == null)
-					break;
 				mergeIfExists = true;
 			}
 		} else
@@ -102,10 +100,10 @@ public class JavaUtilArchiveService {
 		BufferedInputStream bis = null;
 
 		try {
-			fos = new FileOutputStream(toFile);
+			fos = new FileOutputStream(toFilePath);
 			bos = new BufferedOutputStream(fos);
 			zipOutputStream = new ZipOutputStream(bos);
-			// TODO check dir
+
 			fin = new FileInputStream(toBeCompressed);
 			bis = new BufferedInputStream(fin);
 
@@ -126,10 +124,8 @@ public class JavaUtilArchiveService {
 			fin.close();
 			fin = null;
 
-			ret = toFile;
-
 		} catch (Exception e) {
-			LOG.error("Exception cought on compressing file {}", toBeCompressed.toString(), e);
+			LOG.error("Exception cought on compressing file {}", toBeCompressed.toString());
 		} finally {
 			if (zipOutputStream != null) {
 				zipOutputStream.close();
@@ -163,13 +159,11 @@ public class JavaUtilArchiveService {
 
 	private void compressZipEntry(File toBeCompressed, ZipOutputStream zipOutputStream, BufferedInputStream bis)
 			throws IOException {
-		LOG.debug("Compressing now files: {}", toBeCompressed.toString());
 		ZipEntry zEntry = new ZipEntry(toBeCompressed.toString());
 		byte data[] = new byte[BUFFER];
 		int count;
 
 		zipOutputStream.putNextEntry(zEntry);
-
 		while ((count = bis.read(data, 0, BUFFER)) != -1) {
 			zipOutputStream.write(data, 0, count);
 		}

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -25,7 +24,7 @@ public class JavaUtilArchiveServiceTest {
 	public void testSimpleCompress() throws IOException {
 		File dest = new File("dest.zip"), file = new File("testfile.txt");
 
-		assertTrue(!dest.exists() && !file.exists());
+		assertTrue(!dest.exists() && !dest.exists());
 
 		dest.deleteOnExit();
 		file.deleteOnExit();
@@ -34,20 +33,7 @@ public class JavaUtilArchiveServiceTest {
 
 		assertTrue(archiveService.compress(new File[] { file }, dest.getAbsolutePath(), false, null) != null);
 
-		// assertTrue(dest.delete() & file.delete());
-	}
-
-	@Test
-	public void testCompress() throws IOException, URISyntaxException {
-		File dest = new File("test_compress.zip"), file = new File(getClass().getResource("test_compress").getFile());
-
-		assertTrue(!dest.exists() && file.exists());
-
-		dest.deleteOnExit();
-
-		assertTrue(archiveService.compress(new File[] { file }, dest.getAbsolutePath(), false, null) != null);
-
-		assertTrue(dest.delete());
+		assertTrue(dest.delete() & file.delete());
 	}
 
 	@Test

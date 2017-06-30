@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +30,7 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
 
 import it.andreacioni.sdrive.SDrive;
+import it.andreacioni.sdrive.utils.FileUtils;
 import it.andreacioni.sdrive.utils.ResourceUtils;
 
 public class GoogleDriveCloudService implements CloudServive {
@@ -252,10 +252,9 @@ public class GoogleDriveCloudService implements CloudServive {
 		com.google.api.services.drive.model.File ret = null;
 
 		if (!path.equals("/")) {
-			String regex = Pattern.quote("/");
-			String part[] = Arrays.stream(path.split(regex)).filter((s) -> !s.isEmpty()).toArray(String[]::new);
+			String part[] = FileUtils.splitFilePath(path);
 
-			LOG.debug("Splitted path: {},(regex: {})", Arrays.toString(part), regex);
+			LOG.debug("Splitted path: {}", Arrays.toString(part));
 
 			List<com.google.api.services.drive.model.File> list = listFilesInFolder(ROOT_FOLDER);
 			Iterator<com.google.api.services.drive.model.File> iterator = list.iterator();
