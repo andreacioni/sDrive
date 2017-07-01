@@ -4,24 +4,35 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import it.andreacioni.sdrive.SDrive;
 import it.andreacioni.sdrive.utils.ImageUtils;
 
 public class UploadWindow extends JFrame {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -2968256448103259604L;
 
 	private static final int WIDTH = 400;
 
 	private static final int HEIGHT = 400;
 
-	public UploadWindow() {
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
+
+	public UploadWindow(SDrive sDrive) {
 		setTitle("sDrive");
 		setIconImage(ImageUtils.createImage("icon.gif", "title icon"));
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -30,7 +41,7 @@ public class UploadWindow extends JFrame {
 		setEnabled(true);
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
-		UploadPanel panel = new UploadPanel();
+		UploadPanel panel = new UploadPanel(sDrive);
 
 		add(panel);
 	}
@@ -43,7 +54,10 @@ public class UploadWindow extends JFrame {
 
 		private TransferHandler handler;
 
-		public UploadPanel() {
+		private SDrive sDrive;
+
+		public UploadPanel(SDrive sDrive) {
+			this.sDrive = sDrive;
 			setBackground(Color.BLACK);
 			prepareDragAndDropArea();
 		}
@@ -86,16 +100,68 @@ public class UploadWindow extends JFrame {
 				Transferable t = support.getTransferable();
 
 				try {
-					List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
-				} catch (UnsupportedFlavorException e) {
-					e.printStackTrace();
-					return false;
-				} catch (IOException e) {
-					e.printStackTrace();
+					prepareUpload();
+					List<File> filesList = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+					LOG.debug("Uploading files: {}", filesList);
+					if (sDrive.uploadFiles(filesList))
+						LOG.info("Uploading done!");
+					else
+						LOG.error("Uploading FAILED!");
+				} catch (Exception e) {
+					LOG.error("", e);
 					return false;
 				}
 
 				return true;
+			}
+
+			private void prepareUpload() throws IOException {
+
+				if (!sDrive.isPasswordLoaded()) {
+					LOG.info("Insert password to unlock file");
+					if (sDrive.checkFirstStart()) {
+						LOG.info("First start password asking");
+						sDrive.setPassword(askForFirstPassword());
+					} else {
+						sDrive.setPassword(askForStdPassword());
+					}
+
+				}
+			}
+
+			private String askForFirstPassword() {
+				String ret = null;
+				String s1 = askForPassword(
+						"Insert a password for secure archive. You MUST remember it unlock the archive!");
+				String s2 = askForPassword("Please re-type the previous password");
+
+				if (s1.equals(s2)) {
+					ret = s1;
+				} else {
+					JOptionPane.showMessageDialog(UploadWindow.this, "Two password doesn't match!", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					askForFirstPassword();
+				}
+
+				return ret;
+			}
+
+			private String askForStdPassword() {
+				return askForPassword("What is the password of the secure archive? Please type it here below");
+			}
+
+			private String askForPassword(String message) {
+				String ret = null;
+				String s = JOptionPane.showInputDialog(UploadWindow.this, message, "Insert password",
+						JOptionPane.QUESTION_MESSAGE);
+
+				if (s != null && !s.isEmpty()) {
+					ret = s;
+				} else {
+					askForPassword(message);
+				}
+
+				return ret;
 			}
 		}
 	}

@@ -163,11 +163,19 @@ public class GoogleDriveCloudService implements CloudServive {
 		boolean ret = false;
 		com.google.api.services.drive.model.File parent = getDirectory(destPath);
 
-		if (file != null && file.exists() && destPath != null) {
-			com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
-
-			driveService.files().create(fileMetadata.setName(file.getName()).setParents(Arrays.asList(parent.getId())),
-					new FileContent(null, file)).execute();
+		if (file != null && file.exists() && destPath != null && parent != null) {
+			com.google.api.services.drive.model.File exists = getFile(destPath + "/" + file.getName());
+			if (exists != null) {
+				LOG.debug("File exists overwriting previous one...");
+				driveService.files().update(exists.getId(), null, new FileContent(null, file)).execute();
+			} else {
+				LOG.debug("File not exists creating new one...");
+				com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
+				driveService.files()
+						.create(fileMetadata.setName(file.getName()).setParents(Arrays.asList(parent.getId())),
+								new FileContent(null, file).setCloseInputStream(true))
+						.execute();
+			}
 
 			ret = true;
 		} else

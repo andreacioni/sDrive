@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface ArchiveService {
 
-	public List<File> uncompress(File file, String key);
+	public File compress(List<File> toBeCompressed, String toFilePath, String key) throws Exception;
 
-	public File compress(String key, List<File> files);
+	public boolean uncompress(String file, String toDir, String key) throws Exception;
 }

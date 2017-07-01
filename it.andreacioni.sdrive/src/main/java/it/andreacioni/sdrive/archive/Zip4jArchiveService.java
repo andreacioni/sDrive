@@ -11,10 +11,11 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
-public class Zip4jArchiveService {
+public class Zip4jArchiveService implements ArchiveService {
 
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
 
+	@Override
 	public File compress(List<File> toBeCompressed, String toFilePath, String key) throws Exception {
 		LOG.info("Compressing files: {}, into: {}, with key", toBeCompressed, toFilePath, key);
 
@@ -48,9 +49,16 @@ public class Zip4jArchiveService {
 		}
 	}
 
+	@Override
 	public boolean uncompress(String file, String toDir, String key) throws Exception {
 		LOG.info("Uncompressing file: {}, into: {}, with key", file, toDir, key);
 		ZipFile zipFile = new ZipFile(file);
+		if (key != null && !key.isEmpty()) {
+			Log.info("Key supplied, encryption enabled");
+			zipFile.setPassword(key);
+		} else
+			Log.info("No key supplied, encryption disabled");
+
 		zipFile.extractAll(toDir);
 
 		return true;

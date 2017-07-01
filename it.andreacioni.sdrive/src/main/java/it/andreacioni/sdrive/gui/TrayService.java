@@ -11,16 +11,24 @@ import java.awt.event.ActionListener;
 
 import javax.swing.UIManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import it.andreacioni.sdrive.ExitCodes;
+import it.andreacioni.sdrive.SDrive;
 import it.andreacioni.sdrive.utils.ImageUtils;
 
 public class TrayService implements Runnable {
+
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
 
 	private UploadWindow uploadWindow;
 
 	private SystemTray systemTray;
 
 	private PopupMenu popupMenu;
+
+	private final SDrive sDrive = new SDrive();
 
 	private boolean check() {
 		boolean ret = false;
@@ -31,7 +39,7 @@ public class TrayService implements Runnable {
 		}
 
 		if (!GraphicsEnvironment.isHeadless()) {
-			uploadWindow = new UploadWindow();
+			uploadWindow = new UploadWindow(sDrive);
 			ret = true;
 		} else {
 			ret = false;
@@ -49,6 +57,7 @@ public class TrayService implements Runnable {
 		MenuItem exitItem = new MenuItem("Exit");
 
 		uploadItem.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!uploadWindow.isVisible())
 					uploadWindow.setVisible(true);
@@ -59,6 +68,7 @@ public class TrayService implements Runnable {
 
 		trayIcon.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!uploadWindow.isVisible())
 					uploadWindow.setVisible(true);
@@ -68,6 +78,7 @@ public class TrayService implements Runnable {
 		});
 
 		exitItem.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.exit(ExitCodes.NO_ERROR);
 			}
@@ -89,17 +100,20 @@ public class TrayService implements Runnable {
 
 	}
 
+	@Override
 	public void run() {
-		if (check()) {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e) {
+		if (sDrive.init()) {
+			if (check()) {
+				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch (Exception e) {
+					LOG.error("Exception on initialization", e);
+				}
+				preparePopupMenu();
+			} else {
+				System.err.println("SystemTray not supported");
 			}
-			preparePopupMenu();
-		} else {
-			System.err.println("SystemTray not supported");
 		}
-
 	}
 
 }
