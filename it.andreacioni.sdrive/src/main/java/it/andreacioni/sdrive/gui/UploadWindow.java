@@ -128,7 +128,6 @@ public class UploadWindow extends JFrame {
 			}
 
 			private void prepareUpload() throws IOException {
-
 				if (!sDrive.isPasswordLoaded()) {
 					LOG.info("Insert password to unlock file");
 					if (sDrive.checkFirstStart()) {
@@ -137,7 +136,6 @@ public class UploadWindow extends JFrame {
 					} else {
 						sDrive.setPassword(askForStdPassword());
 					}
-
 				}
 			}
 

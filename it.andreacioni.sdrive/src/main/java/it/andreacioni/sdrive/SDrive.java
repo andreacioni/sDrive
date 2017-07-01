@@ -29,13 +29,13 @@ public class SDrive {
 
 	public static final File LOCAL_TEMP_DIR = new File(DATA_STORE_DIR, "tempdir");
 
-	public static final String LOCAL_README_FILE = "README";
+	public static final String LOCAL_README_FILE_NAME = "README.txt";
 
 	public static final String REMOTE_SDRIVE_DIR = "sDrive";
 
 	public static final String REMOTE_SDRIVE_PATH = "/" + REMOTE_SDRIVE_DIR;
 
-	public static final String REMOTE_README_PATH = REMOTE_SDRIVE_PATH + "/README";
+	public static final String REMOTE_README_PATH = REMOTE_SDRIVE_PATH + "/" + LOCAL_README_FILE_NAME;
 
 	public static final String REMOTE_ARCHIVE_PATH = REMOTE_SDRIVE_PATH + "/" + ZIP_NAME;
 
@@ -184,7 +184,7 @@ public class SDrive {
 	private boolean uploadRemoteArchive() throws IOException {
 		LOG.debug("Uploading file to remote");
 		return (cloudService.upload(LOCAL_ARCHIVE, REMOTE_SDRIVE_PATH)) && (cloudService.fileExists(REMOTE_README_PATH)
-				|| (cloudService.upload(ResourceUtils.asFile(LOCAL_README_FILE), REMOTE_SDRIVE_PATH)));
+				|| (cloudService.upload(ResourceUtils.asFile(LOCAL_README_FILE_NAME), REMOTE_SDRIVE_PATH)));
 	}
 
 	private boolean clearTempFileAndDirectory() {

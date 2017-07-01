@@ -275,9 +275,7 @@ public class GoogleDriveCloudService implements CloudServive {
 
 				com.google.api.services.drive.model.File f = iterator.next();
 
-				if (!f.getName().equals(part[i]))
-					return null;
-				else {
+				if (f.getName().equals(part[i])) {
 					list = listFilesInFolder(f.getId());
 					iterator = list.iterator();
 					ret = f;
