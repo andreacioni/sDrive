@@ -134,7 +134,7 @@ public class SDrive {
 		if (zipArchiveFromTempDir()) {
 			LOG.debug("Zip done!");
 			createRemoteDirIfNotExists();
-			ret = cloudService.upload(LOCAL_ARCHIVE, REMOTE_SDRIVE_PATH);
+			ret = uploadRemoteArchive();
 		} else {
 			LOG.error("Cannot compress that files");
 		}
@@ -183,8 +183,8 @@ public class SDrive {
 
 	private boolean uploadRemoteArchive() throws IOException {
 		LOG.debug("Uploading file to remote");
-		return (cloudService.upload(LOCAL_ARCHIVE, REMOTE_ARCHIVE_PATH)) && (cloudService.fileExists(REMOTE_README_PATH)
-				|| (cloudService.upload(ResourceUtils.asFile(LOCAL_README_FILE), REMOTE_README_PATH)));
+		return (cloudService.upload(LOCAL_ARCHIVE, REMOTE_SDRIVE_PATH)) && (cloudService.fileExists(REMOTE_README_PATH)
+				|| (cloudService.upload(ResourceUtils.asFile(LOCAL_README_FILE), REMOTE_SDRIVE_PATH)));
 	}
 
 	private boolean clearTempFileAndDirectory() {
