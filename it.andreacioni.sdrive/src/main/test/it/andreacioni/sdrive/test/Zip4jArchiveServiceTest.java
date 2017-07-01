@@ -76,7 +76,7 @@ public class Zip4jArchiveServiceTest {
 
 		assertTrue(!uncompressed.exists());
 
-		assertTrue(archiveService.uncompress(getClass().getResource("test_decompress_1.zip").getFile(), toDir, null));
+		archiveService.uncompress(getClass().getResource("test_decompress_1.zip").getFile(), toDir, null);
 
 		assertTrue(uncompressed.exists());
 		assertTrue(uncompressed.isDirectory());
@@ -94,7 +94,7 @@ public class Zip4jArchiveServiceTest {
 
 		assertTrue(!uncompressed.exists());
 
-		assertTrue(archiveService.uncompress(getClass().getResource("test_decompress_2.zip").getFile(), toDir, null));
+		archiveService.uncompress(getClass().getResource("test_decompress_2.zip").getFile(), toDir, null);
 
 		assertTrue(uncompressed.exists());
 		assertTrue(uncompressed.isDirectory());
@@ -113,7 +113,7 @@ public class Zip4jArchiveServiceTest {
 
 		assertTrue(!uncompressed.exists());
 
-		assertTrue(archiveService.uncompress(getClass().getResource("test_decompress_3.zip").getFile(), toDir, null));
+		archiveService.uncompress(getClass().getResource("test_decompress_3.zip").getFile(), toDir, null);
 
 		assertTrue(uncompressed.exists());
 		assertTrue(uncompressed.isDirectory());

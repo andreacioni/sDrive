@@ -64,7 +64,7 @@ public class SDrive {
 		return !cloudService.fileExists(REMOTE_ARCHIVE_PATH);
 	}
 
-	public void setPassword(String psw) {
+	public synchronized void setPassword(String psw) {
 		masterPassword = psw;
 	}
 
@@ -72,57 +72,43 @@ public class SDrive {
 		return masterPassword != null && !masterPassword.isEmpty();
 	}
 
-	public synchronized boolean uploadFiles(List<File> files) {
-		boolean ret = false;
-
+	public synchronized void uploadFiles(List<File> files) throws IOException {
 		if (files != null && files.size() != 0) {
 			if (isPasswordLoaded()) {
-				try {
-					if (clearTempFileAndDirectory()) {
-						if (LOCAL_TEMP_DIR.mkdir()) {
-							boolean fisrtStart = checkFirstStart();
-							if (!fisrtStart) {
-								LOG.debug("Not first start, archive file is present on remote");
-								if (downloadRemoteArchive()) {
-									LOG.debug("Download done!");
-									if (unzipArchiveToTempDir()) {
-										LOG.debug("Unzip done!");
-										ret = copyToTempAndUpload(files, fisrtStart);
-									} else {
-										LOG.error("Failed to uncompress archive, wrong password?");
-										masterPassword = null;
-									}
-								} else {
-									LOG.error("Failed to download archive");
-								}
+				if (clearTempFileAndDirectory()) {
+					if (LOCAL_TEMP_DIR.mkdir()) {
+						boolean fisrtStart = checkFirstStart();
+						if (!fisrtStart) {
+							LOG.debug("Not first start, archive file is present on remote");
+							if (downloadRemoteArchive()) {
+								LOG.debug("Download done!");
 
+								unzipArchiveToTempDir();
+								LOG.debug("Unzip done!");
+								copyToTempAndUpload(files, fisrtStart);
 							} else {
-								LOG.warn("First start");
-								ret = copyToTempAndUpload(files, fisrtStart);
+								throw new IOException("Failed to download archive");
 							}
+
 						} else {
-							LOG.error("Cannot create temp folder");
+							LOG.warn("First start");
+							copyToTempAndUpload(files, fisrtStart);
 						}
 					} else {
-						LOG.error("Cannot delete local archive");
+						throw new IOException("Cannot create temp folder");
 					}
-
-				} catch (Exception e) {
-					LOG.error("Exception caught", e);
-				} finally {
-					clearTempFileAndDirectory();
+				} else {
+					throw new IOException("Cannot delete local archive");
 				}
 			} else
-				LOG.error("Master password not set yet");
+				throw new NullPointerException("Master password not set yet");
 
 		} else
-			LOG.error("Invalid file list");
-
-		return ret;
+			throw new IllegalArgumentException("Invalid file list");
 
 	}
 
-	private boolean copyToTempAndUpload(List<File> files, boolean firstStart) throws Exception {
+	private boolean copyToTempAndUpload(List<File> files, boolean firstStart) throws IOException {
 		boolean ret = false;
 		copyNewFileToTempDir(files);
 
@@ -148,7 +134,7 @@ public class SDrive {
 		}
 	}
 
-	private void copyNewFileToTempDir(List<File> files) throws Exception {
+	private void copyNewFileToTempDir(List<File> files) throws IOException {
 		for (File f : files) {
 			if (f.exists()) {
 				LOG.debug("Copying (recursive) file {} to temp dir", f.getName());
@@ -163,13 +149,12 @@ public class SDrive {
 		}
 	}
 
-	private boolean unzipArchiveToTempDir() throws Exception {
+	private void unzipArchiveToTempDir() throws IOException {
 		LOG.debug("Uncompressing dowloaded zip file");
-		return archiveService.uncompress(LOCAL_ARCHIVE.getAbsolutePath(), LOCAL_TEMP_DIR.getAbsolutePath(),
-				masterPassword);
+		archiveService.uncompress(LOCAL_ARCHIVE.getAbsolutePath(), LOCAL_TEMP_DIR.getAbsolutePath(), masterPassword);
 	}
 
-	private boolean zipArchiveFromTempDir() throws Exception {
+	private boolean zipArchiveFromTempDir() throws IOException {
 		LOG.debug("Compressing new zip file");
 		return (archiveService.compress(Arrays.asList(LOCAL_TEMP_DIR.listFiles()), LOCAL_ARCHIVE.getAbsolutePath(),
 				masterPassword) != null) && LOCAL_ARCHIVE.exists();

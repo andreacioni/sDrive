@@ -59,9 +59,11 @@ public class TrayService implements Runnable {
 		uploadItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!uploadWindow.isVisible())
+				if (!uploadWindow.isVisible()) {
 					uploadWindow.setVisible(true);
-				else
+					uploadWindow.requestFocus();
+					uploadWindow.toFront();
+				} else
 					uploadWindow.setVisible(false);
 			}
 		});
@@ -70,9 +72,11 @@ public class TrayService implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!uploadWindow.isVisible())
+				if (!uploadWindow.isVisible()) {
 					uploadWindow.setVisible(true);
-				else
+					uploadWindow.requestFocus();
+					uploadWindow.toFront();
+				} else
 					uploadWindow.setVisible(false);
 			}
 		});

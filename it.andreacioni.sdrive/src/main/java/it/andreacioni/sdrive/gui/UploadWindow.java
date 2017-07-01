@@ -109,12 +109,10 @@ public class UploadWindow extends JFrame {
 							try {
 								prepareUpload();
 								LOG.debug("Uploading files: {}", filesList);
-								if (sDrive.uploadFiles(filesList))
-									LOG.info("Uploading done!");
-								else
-									LOG.error("Uploading FAILED!");
-							} catch (Exception e) {
-								LOG.error("Preparing upload fails", e);
+								sDrive.uploadFiles(filesList);
+								LOG.info("Uploading done!");
+							} catch (IOException e) {
+								LOG.error("Upload failed", e);
 							}
 
 						}
