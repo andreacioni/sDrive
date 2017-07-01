@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -98,16 +99,27 @@ public class UploadWindow extends JFrame {
 				}
 
 				Transferable t = support.getTransferable();
-
+				List<File> filesList;
 				try {
-					prepareUpload();
-					List<File> filesList = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
-					LOG.debug("Uploading files: {}", filesList);
-					if (sDrive.uploadFiles(filesList))
-						LOG.info("Uploading done!");
-					else
-						LOG.error("Uploading FAILED!");
-				} catch (Exception e) {
+					filesList = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+					new Thread(new Runnable() {
+
+						@Override
+						public void run() {
+							try {
+								prepareUpload();
+								LOG.debug("Uploading files: {}", filesList);
+								if (sDrive.uploadFiles(filesList))
+									LOG.info("Uploading done!");
+								else
+									LOG.error("Uploading FAILED!");
+							} catch (Exception e) {
+								LOG.error("Preparing upload fails", e);
+							}
+
+						}
+					}).start();
+				} catch (UnsupportedFlavorException | IOException e) {
 					LOG.error("", e);
 					return false;
 				}
