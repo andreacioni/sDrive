@@ -4,25 +4,25 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import it.andreacioni.sdrive.archive.JavaUtilArchiveService;
+import it.andreacioni.sdrive.archive.Zip4jArchiveService;
 
-public class JavaUtilArchiveServiceTest {
+public class Zip4jArchiveServiceTest {
 
-	private JavaUtilArchiveService archiveService;
+	private Zip4jArchiveService archiveService;
 
 	@Before
 	public void init() {
-		archiveService = new JavaUtilArchiveService();
+		archiveService = new Zip4jArchiveService();
 	}
 
 	@Test
-	public void testSimpleCompress() throws IOException {
+	public void testSimpleCompress() throws Exception {
 		File dest = new File("dest.zip"), file = new File("testfile.txt");
 
 		assertTrue(!dest.exists() && !file.exists());
@@ -32,28 +32,45 @@ public class JavaUtilArchiveServiceTest {
 
 		assertTrue(file.createNewFile());
 
-		assertTrue(archiveService.compress(new File[] { file }, dest.getAbsolutePath(), false, null) != null);
+		assertTrue(archiveService.compress(Arrays.asList(file), dest.getAbsolutePath(), null) != null);
 
 		assertTrue(dest.delete() & file.delete());
 	}
 
 	@Test
-	public void testCompress() throws IOException, URISyntaxException {
-		// File dest = new File("test_compress.zip"), file = new
-		// File(getClass().getResource("test_compress").getFile());
-		//
-		// assertTrue(!dest.exists() && file.exists());
-		//
-		// dest.deleteOnExit();
-		//
-		// assertTrue(archiveService.compress(new File[] { file },
-		// dest.getAbsolutePath(), false, null) != null);
-		//
-		// assertTrue(dest.delete());
+	public void testSimpleCompressAlreadyExists() throws Exception {
+		File dest = new File("dest.zip"), f1 = new File("testfile.txt"), f2 = new File("testfile1.txt");
+
+		assertTrue(!dest.exists() && !f1.exists() && !f2.exists());
+
+		dest.deleteOnExit();
+		f1.deleteOnExit();
+		f2.deleteOnExit();
+
+		assertTrue(f1.createNewFile() && f2.createNewFile());
+
+		assertTrue(archiveService.compress(Arrays.asList(f1, f2), dest.getAbsolutePath(), null) != null);
+
+		assertTrue(archiveService.compress(Arrays.asList(f1), dest.getAbsolutePath(), null) != null);
+
+		assertTrue(dest.delete() & f1.delete() & f2.delete());
 	}
 
 	@Test
-	public void uncompressTest1() throws IOException {
+	public void testCompress() throws Exception {
+		File dest = new File("test_compress.zip"), file = new File(getClass().getResource("test_compress").getFile());
+
+		assertTrue(!dest.exists() && file.exists());
+
+		dest.deleteOnExit();
+
+		assertTrue(archiveService.compress(Arrays.asList(file), dest.getAbsolutePath(), null) != null);
+
+		assertTrue(dest.delete());
+	}
+
+	@Test
+	public void uncompressTest1() throws Exception {
 		String toDir = "test";
 		File uncompressed = new File(toDir);
 
@@ -71,7 +88,7 @@ public class JavaUtilArchiveServiceTest {
 	}
 
 	@Test
-	public void uncompressTest2() throws IOException {
+	public void uncompressTest2() throws Exception {
 		String toDir = "test";
 		File uncompressed = new File(toDir);
 
@@ -90,7 +107,7 @@ public class JavaUtilArchiveServiceTest {
 	}
 
 	@Test
-	public void uncompressTest3() throws IOException {
+	public void uncompressTest3() throws Exception {
 		String toDir = "test";
 		File uncompressed = new File(toDir);
 
