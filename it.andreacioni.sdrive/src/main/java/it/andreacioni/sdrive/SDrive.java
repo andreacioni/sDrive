@@ -45,6 +45,8 @@ public class SDrive {
 
 	private String masterPassword;
 
+	private String accountName;
+
 	public SDrive() {
 		cloudService = new GoogleDriveCloudService();
 		archiveService = new Zip4jArchiveService();
@@ -54,10 +56,15 @@ public class SDrive {
 		boolean ret = false;
 		try {
 			ret = cloudService.connect();
+			accountName = cloudService.getAccountName();
 		} catch (IOException e) {
 			LOG.error("Exception connecting to cloud service");
 		}
 		return ret;
+	}
+
+	public String getAccountName() {
+		return accountName;
 	}
 
 	public boolean checkFirstStart() throws IOException {
@@ -87,6 +94,7 @@ public class SDrive {
 								LOG.debug("Unzip done!");
 								copyToTempAndUpload(files, fisrtStart);
 							} else {
+								setPassword(null);
 								throw new IOException("Failed to download archive");
 							}
 
@@ -101,7 +109,7 @@ public class SDrive {
 					throw new IOException("Cannot delete local archive");
 				}
 			} else
-				throw new NullPointerException("Master password not set yet");
+				throw new RuntimeException("Master password not set yet");
 
 		} else
 			throw new IllegalArgumentException("Invalid file list");

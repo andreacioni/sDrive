@@ -1,7 +1,10 @@
 package it.andreacioni.sdrive.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -9,7 +12,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
@@ -26,6 +31,10 @@ public class UploadWindow extends JFrame {
 	 *
 	 */
 	private static final long serialVersionUID = -2968256448103259604L;
+
+	private static final Color BACKG_COLOR = new Color(238, 238, 238);
+
+	private static final Color DD_COLOR = new Color(154, 154, 154);
 
 	private static final int WIDTH = 400;
 
@@ -53,19 +62,52 @@ public class UploadWindow extends JFrame {
 		 */
 		private static final long serialVersionUID = -7958340744297357525L;
 
-		private TransferHandler handler;
-
 		private SDrive sDrive;
 
 		public UploadPanel(SDrive sDrive) {
 			this.sDrive = sDrive;
-			setBackground(Color.BLACK);
-			prepareDragAndDropArea();
+			setLayout(new BorderLayout());
+			setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+			add(new BottomInfoPanel(), BorderLayout.PAGE_END);
+			add(new DragAndDropAreaPanel(), BorderLayout.CENTER);
 		}
 
-		private void prepareDragAndDropArea() {
-			handler = new CustomTransferHandler();
-			setTransferHandler(handler);
+		private class BottomInfoPanel extends JPanel {
+
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 658744024156732618L;
+
+			public BottomInfoPanel() {
+				setBackground(BACKG_COLOR);
+				JLabel label = new JLabel("sDrive (Secure Drive) - Andrea Cioni - 2017");
+				label.setFont(new Font("Arial", Font.ITALIC, 10));
+				add(label);
+			}
+
+		}
+
+		private class DragAndDropAreaPanel extends JPanel {
+
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1238744024156111618L;
+
+			public DragAndDropAreaPanel() {
+				setBackground(BACKG_COLOR);
+				setLayout(new GridBagLayout());
+				setBorder(BorderFactory.createDashedBorder(DD_COLOR, 5, 10, 2, true));
+
+				JLabel label = new JLabel("Drop your files here");
+				label.setFont(new Font("Arial", Font.BOLD, 20));
+				label.setForeground(DD_COLOR);
+				add(label);
+
+				setTransferHandler(new CustomTransferHandler());
+			}
+
 		}
 
 		private class CustomTransferHandler extends TransferHandler {
@@ -92,6 +134,7 @@ public class UploadWindow extends JFrame {
 
 			}
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public boolean importData(TransferHandler.TransferSupport support) {
 				if (!canImport(support)) {
@@ -107,10 +150,12 @@ public class UploadWindow extends JFrame {
 						@Override
 						public void run() {
 							try {
-								prepareUpload();
-								LOG.debug("Uploading files: {}", filesList);
-								sDrive.uploadFiles(filesList);
-								LOG.info("Uploading done!");
+								if (prepareUpload()) {
+									LOG.debug("Uploading files: {}", filesList);
+									sDrive.uploadFiles(filesList);
+									LOG.info("Uploading done!");
+								} else
+									LOG.error("No password supplied, cannot upload");
 							} catch (IOException e) {
 								LOG.error("Upload failed", e);
 							}
@@ -125,30 +170,43 @@ public class UploadWindow extends JFrame {
 				return true;
 			}
 
-			private void prepareUpload() throws IOException {
+			private synchronized boolean prepareUpload() throws IOException {
+				boolean ret = false;
+				String s = null;
 				if (!sDrive.isPasswordLoaded()) {
 					LOG.info("Insert password to unlock file");
 					if (sDrive.checkFirstStart()) {
 						LOG.info("First start password asking");
-						sDrive.setPassword(askForFirstPassword());
+						s = askForFirstPassword();
 					} else {
-						sDrive.setPassword(askForStdPassword());
+						s = askForStdPassword();
+					}
+
+					if (s != null) {
+						sDrive.setPassword(s);
+						ret = true;
 					}
 				}
+
+				return ret;
 			}
 
 			private String askForFirstPassword() {
 				String ret = null;
 				String s1 = askForPassword(
 						"Insert a password for secure archive. You MUST remember it unlock the archive!");
-				String s2 = askForPassword("Please re-type the previous password");
+				if (s1 != null) {
+					String s2 = askForPassword("Please re-type the previous password");
 
-				if (s1.equals(s2)) {
-					ret = s1;
-				} else {
-					JOptionPane.showMessageDialog(UploadWindow.this, "Two password doesn't match!", "Error",
-							JOptionPane.ERROR_MESSAGE);
-					askForFirstPassword();
+					if (s2 != null) {
+						if (s1.equals(s2)) {
+							ret = s1;
+						} else {
+							JOptionPane.showMessageDialog(UploadWindow.this, "Two password doesn't match!", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							askForFirstPassword();
+						}
+					}
 				}
 
 				return ret;
@@ -163,7 +221,7 @@ public class UploadWindow extends JFrame {
 				String s = JOptionPane.showInputDialog(UploadWindow.this, message, "Insert password",
 						JOptionPane.QUESTION_MESSAGE);
 
-				if (s != null && !s.isEmpty()) {
+				if (s == null || !s.isEmpty()) {
 					ret = s;
 				} else {
 					askForPassword(message);
@@ -172,6 +230,7 @@ public class UploadWindow extends JFrame {
 				return ret;
 			}
 		}
+
 	}
 
 }
