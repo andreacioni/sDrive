@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import it.andreacioni.commons.swing.JProgressDialog;
 import it.andreacioni.commons.swing.ProgressCallback;
+import it.andreacioni.commons.thread.StrongThread;
 import it.andreacioni.sdrive.SDrive;
 import it.andreacioni.sdrive.utils.ExceptionUtils;
 import it.andreacioni.sdrive.utils.ImageUtils;
@@ -147,7 +148,11 @@ public class UploadWindow extends JFrame {
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
-							launchUploadThread(filesList);
+							try {
+								launchUploadThread(filesList);
+							} catch (InterruptedException e) {
+								LOG.error("Interrupted", e);
+							}
 						}
 					}).start();
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -158,10 +163,10 @@ public class UploadWindow extends JFrame {
 				return true;
 			}
 
-			private void launchUploadThread(List<File> filesList) {
+			private void launchUploadThread(List<File> filesList) throws InterruptedException {
 				final JProgressDialog progressDialog = new JProgressDialog(UploadWindow.this, "Progress", "Starting...",
 						0, 0);
-				final Thread thread = new Thread(new Runnable() {
+				final StrongThread thread = new StrongThread(new Runnable() {
 
 					@Override
 					public void run() {
@@ -175,8 +180,6 @@ public class UploadWindow extends JFrame {
 									}
 								});
 								LOG.info("Uploading done!");
-								JOptionPane.showMessageDialog(UploadWindow.this, "Upload done!", "Info",
-										JOptionPane.INFORMATION_MESSAGE);
 							} else {
 								LOG.error("No password supplied, cannot upload");
 							}
@@ -201,8 +204,13 @@ public class UploadWindow extends JFrame {
 
 				progressDialog.showDialog();
 
-				if (progressDialog.isCancelled())
-					thread.interrupt();
+				if (progressDialog.isCancelled()) {
+					LOG.warn("Operation cancelled");
+					thread.stop();
+				} else {
+					JOptionPane.showMessageDialog(UploadWindow.this, "Upload done!", "Info",
+							JOptionPane.INFORMATION_MESSAGE);
+				}
 			}
 
 			private synchronized boolean prepareUpload() throws IOException {
