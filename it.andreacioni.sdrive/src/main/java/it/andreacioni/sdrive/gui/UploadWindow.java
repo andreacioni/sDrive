@@ -22,7 +22,10 @@ import javax.swing.TransferHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.andreacioni.commons.swing.JProgressDialog;
+import it.andreacioni.commons.swing.ProgressCallback;
 import it.andreacioni.sdrive.SDrive;
+import it.andreacioni.sdrive.utils.ExceptionUtils;
 import it.andreacioni.sdrive.utils.ImageUtils;
 
 public class UploadWindow extends JFrame {
@@ -41,6 +44,7 @@ public class UploadWindow extends JFrame {
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
 
 	public UploadWindow(SDrive sDrive) {
+
 		setTitle("sDrive");
 		setIconImage(ImageUtils.createImage("icon.gif", "title icon"));
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -138,24 +142,12 @@ public class UploadWindow extends JFrame {
 				}
 
 				Transferable t = support.getTransferable();
-				List<File> filesList;
 				try {
-					filesList = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+					final List<File> filesList = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
 					new Thread(new Runnable() {
-
 						@Override
 						public void run() {
-							try {
-								if (prepareUpload()) {
-									LOG.debug("Uploading files: {}", filesList);
-									sDrive.uploadFiles(filesList);
-									LOG.info("Uploading done!");
-								} else
-									LOG.error("No password supplied, cannot upload");
-							} catch (IOException e) {
-								LOG.error("Upload failed", e);
-							}
-
+							launchUploadThread(filesList);
 						}
 					}).start();
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -166,9 +158,57 @@ public class UploadWindow extends JFrame {
 				return true;
 			}
 
+			private void launchUploadThread(List<File> filesList) {
+				final JProgressDialog progressDialog = new JProgressDialog(UploadWindow.this, "Progress", "Starting...",
+						0, 0);
+				final Thread thread = new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						try {
+							if (prepareUpload()) {
+								LOG.debug("Uploading files: {}", filesList);
+								sDrive.uploadFiles(filesList, new ProgressCallback<String>() {
+									@Override
+									public void progressUpdate(String progress) {
+										progressDialog.setText(progress);
+									}
+								});
+								LOG.info("Uploading done!");
+								JOptionPane.showMessageDialog(UploadWindow.this, "Upload done!", "Info",
+										JOptionPane.INFORMATION_MESSAGE);
+							} else {
+								LOG.error("No password supplied, cannot upload");
+							}
+						} catch (IOException e) {
+							LOG.error("Upload failed", e);
+							sDrive.setPassword(null);
+							try {
+								JOptionPane.showMessageDialog(UploadWindow.this,
+										"Upload failed!\n" + ExceptionUtils.stackTraceToString(e), "Error",
+										JOptionPane.ERROR_MESSAGE);
+							} catch (IOException e1) {
+								LOG.error("Failed print cause", e1);
+							}
+						} finally {
+							progressDialog.closeDialog();
+						}
+
+					}
+				});
+
+				thread.start();
+
+				progressDialog.showDialog();
+
+				if (progressDialog.isCancelled())
+					thread.interrupt();
+			}
+
 			private synchronized boolean prepareUpload() throws IOException {
 				boolean ret = false;
 				String s = null;
+
 				if (!sDrive.isPasswordLoaded()) {
 					LOG.info("Insert password to unlock file");
 					if (sDrive.checkFirstStart()) {
@@ -182,7 +222,8 @@ public class UploadWindow extends JFrame {
 						sDrive.setPassword(s);
 						ret = true;
 					}
-				}
+				} else
+					ret = true;
 
 				return ret;
 			}

@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.andreacioni.commons.swing.ProgressCallback;
 import it.andreacioni.sdrive.archive.ArchiveService;
 import it.andreacioni.sdrive.archive.Zip4jArchiveService;
 import it.andreacioni.sdrive.cloud.CloudServive;
@@ -80,26 +81,38 @@ public class SDrive {
 	}
 
 	public synchronized void uploadFiles(List<File> files) throws IOException {
+		uploadFiles(files, null);
+	}
+
+	public synchronized void uploadFiles(List<File> files, ProgressCallback<String> progressCallback)
+			throws IOException {
 		if (files != null && files.size() != 0) {
+			updateProgress("Checking password loaded...", progressCallback);
 			if (isPasswordLoaded()) {
+				updateProgress("Clearing temp directory...", progressCallback);
 				if (clearTempFileAndDirectory()) {
+					updateProgress("Creating temp directory...", progressCallback);
 					if (LOCAL_TEMP_DIR.mkdir()) {
 						boolean fisrtStart = checkFirstStart();
 						if (!fisrtStart) {
 							LOG.debug("Not first start, archive file is present on remote");
+							updateProgress("Downloading remote archive...", progressCallback);
 							if (downloadRemoteArchive()) {
 								LOG.debug("Download done!");
 
+								updateProgress("Uncompressing remote archive locally...", progressCallback);
 								unzipArchiveToTempDir();
 								LOG.debug("Unzip done!");
+
+								updateProgress("Uploading file...", progressCallback);
 								copyToTempAndUpload(files, fisrtStart);
 							} else {
-								setPassword(null);
 								throw new IOException("Failed to download archive");
 							}
 
 						} else {
 							LOG.warn("First start");
+							updateProgress("Uploading file...", progressCallback);
 							copyToTempAndUpload(files, fisrtStart);
 						}
 					} else {
@@ -114,6 +127,11 @@ public class SDrive {
 		} else
 			throw new IllegalArgumentException("Invalid file list");
 
+	}
+
+	private void updateProgress(String newState, ProgressCallback<String> progressCallback) {
+		if (progressCallback != null)
+			progressCallback.progressUpdate(newState);
 	}
 
 	private boolean copyToTempAndUpload(List<File> files, boolean firstStart) throws IOException {
