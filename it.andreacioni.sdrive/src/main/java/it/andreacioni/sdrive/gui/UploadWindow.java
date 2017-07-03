@@ -32,8 +32,6 @@ public class UploadWindow extends JFrame {
 	 */
 	private static final long serialVersionUID = -2968256448103259604L;
 
-	private static final Color BACKG_COLOR = new Color(238, 238, 238);
-
 	private static final Color DD_COLOR = new Color(154, 154, 154);
 
 	private static final int WIDTH = 400;
@@ -80,7 +78,6 @@ public class UploadWindow extends JFrame {
 			private static final long serialVersionUID = 658744024156732618L;
 
 			public BottomInfoPanel() {
-				setBackground(BACKG_COLOR);
 				JLabel label = new JLabel("sDrive (Secure Drive) - Andrea Cioni - 2017");
 				label.setFont(new Font("Arial", Font.ITALIC, 10));
 				add(label);
@@ -96,7 +93,6 @@ public class UploadWindow extends JFrame {
 			private static final long serialVersionUID = 1238744024156111618L;
 
 			public DragAndDropAreaPanel() {
-				setBackground(BACKG_COLOR);
 				setLayout(new GridBagLayout());
 				setBorder(BorderFactory.createDashedBorder(DD_COLOR, 5, 10, 2, true));
 
