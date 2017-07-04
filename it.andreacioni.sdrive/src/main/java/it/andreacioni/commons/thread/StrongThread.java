@@ -3,7 +3,6 @@ package it.andreacioni.commons.thread;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 public class StrongThread {
 	private Runnable runnable;
@@ -22,7 +21,7 @@ public class StrongThread {
 		future = executorService.submit(runnable);
 	}
 
-	public void stop() throws InterruptedException {
+	public void stop() {
 		stop(true);
 	}
 
@@ -34,14 +33,13 @@ public class StrongThread {
 		return future.isDone();
 	}
 
-	public void stop(boolean mayInterruptIfRunning) throws InterruptedException {
+	public void stop(boolean mayInterruptIfRunning) {
 		if (future != null) {
 			future.cancel(mayInterruptIfRunning);
 			future = null;
 		}
 
 		if (executorService != null) {
-			executorService.awaitTermination(10, TimeUnit.SECONDS);
 			executorService.shutdown();
 			executorService.shutdownNow();
 			executorService = null;

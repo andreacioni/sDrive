@@ -101,19 +101,20 @@ public class SDrive {
 								LOG.debug("Download done!");
 
 								updateProgress("Uncompressing remote archive locally...", progressCallback);
-								unzipArchiveToTempDir();
-								LOG.debug("Unzip done!");
-
-								updateProgress("Uploading file...", progressCallback);
-								copyToTempAndUpload(files, fisrtStart);
+								if (unzipArchiveToTempDir()) {
+									LOG.debug("Unzip done!");
+									copyToTempAndUpload(files, fisrtStart, progressCallback);
+								} else {
+									setPassword(null);
+									throw new IOException("Failed to unzip archive. Wrong password?");
+								}
 							} else {
 								throw new IOException("Failed to download archive");
 							}
 
 						} else {
 							LOG.warn("First start");
-							updateProgress("Uploading file...", progressCallback);
-							copyToTempAndUpload(files, fisrtStart);
+							copyToTempAndUpload(files, fisrtStart, progressCallback);
 						}
 					} else {
 						throw new IOException("Cannot create temp folder");
@@ -134,18 +135,22 @@ public class SDrive {
 			progressCallback.progressUpdate(newState);
 	}
 
-	private boolean copyToTempAndUpload(List<File> files, boolean firstStart) throws IOException {
+	private boolean copyToTempAndUpload(List<File> files, boolean firstStart, ProgressCallback<String> progressCallback)
+			throws IOException {
 		boolean ret = false;
 		copyNewFileToTempDir(files);
 
 		if (!firstStart) {
 			LOG.debug("Removing old zip file");
+			updateProgress("Removing old zip file...", progressCallback);
 			removeZipFileIfExists();
 		}
 
+		updateProgress("Zipping new archive...", progressCallback);
 		if (zipArchiveFromTempDir()) {
 			LOG.debug("Zip done!");
 			createRemoteDirIfNotExists();
+			updateProgress("Uploading...", progressCallback);
 			ret = uploadRemoteArchive();
 		} else {
 			LOG.error("Cannot compress that files");
@@ -175,9 +180,16 @@ public class SDrive {
 		}
 	}
 
-	private void unzipArchiveToTempDir() throws IOException {
+	private boolean unzipArchiveToTempDir() {
 		LOG.debug("Uncompressing dowloaded zip file");
-		archiveService.uncompress(LOCAL_ARCHIVE.getAbsolutePath(), LOCAL_TEMP_DIR.getAbsolutePath(), masterPassword);
+		try {
+			archiveService.uncompress(LOCAL_ARCHIVE.getAbsolutePath(), LOCAL_TEMP_DIR.getAbsolutePath(),
+					masterPassword);
+			return true;
+		} catch (IOException e) {
+			LOG.error("", e);
+			return false;
+		}
 	}
 
 	private boolean zipArchiveFromTempDir() throws IOException {

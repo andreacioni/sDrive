@@ -1,14 +1,15 @@
 package it.andreacioni.commons.swing;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.Semaphore;
 
+import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 
@@ -71,19 +72,21 @@ public class JProgressDialog extends JDialog {
 
 	private void createProgressUI(String text, boolean indeterminate) {
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		setLayout(new BorderLayout());
-		setSize(300, 70);
+		setSize(320, 70);
 		setModal(true);
 		setLocationRelativeTo(motherFrame);
 
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		if (text != null)
 			label.setText(text);
 
 		progressBar.setIndeterminate(indeterminate);
-		progressBar.setForeground(new Color(73, 216, 0));
 
-		add(label, BorderLayout.PAGE_START);
-		add(progressBar, BorderLayout.PAGE_END);
+		panel.add(label, BorderLayout.PAGE_START);
+		panel.add(progressBar, BorderLayout.PAGE_END);
+
+		add(panel);
 
 		addWindowListener(new WindowAdapter() {
 			@Override

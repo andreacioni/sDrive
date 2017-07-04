@@ -148,11 +148,7 @@ public class UploadWindow extends JFrame {
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
-							try {
-								launchUploadThread(filesList);
-							} catch (InterruptedException e) {
-								LOG.error("Interrupted", e);
-							}
+							launchUploadThread(filesList);
 						}
 					}).start();
 				} catch (UnsupportedFlavorException | IOException e) {
@@ -163,7 +159,7 @@ public class UploadWindow extends JFrame {
 				return true;
 			}
 
-			private void launchUploadThread(List<File> filesList) throws InterruptedException {
+			private void launchUploadThread(List<File> filesList) {
 				final JProgressDialog progressDialog = new JProgressDialog(UploadWindow.this, "Progress", "Starting...",
 						0, 0);
 				final StrongThread thread = new StrongThread(new Runnable() {
@@ -180,12 +176,15 @@ public class UploadWindow extends JFrame {
 									}
 								});
 								LOG.info("Uploading done!");
+								JOptionPane.showMessageDialog(UploadWindow.this, "Upload done!", "Info",
+										JOptionPane.INFORMATION_MESSAGE);
 							} else {
 								LOG.error("No password supplied, cannot upload");
+								JOptionPane.showMessageDialog(UploadWindow.this, "No password supplied, cannot upload",
+										"Error", JOptionPane.ERROR_MESSAGE);
 							}
 						} catch (IOException e) {
 							LOG.error("Upload failed", e);
-							sDrive.setPassword(null);
 							try {
 								JOptionPane.showMessageDialog(UploadWindow.this,
 										"Upload failed!\n" + ExceptionUtils.stackTraceToString(e), "Error",
@@ -207,9 +206,6 @@ public class UploadWindow extends JFrame {
 				if (progressDialog.isCancelled()) {
 					LOG.warn("Operation cancelled");
 					thread.stop();
-				} else {
-					JOptionPane.showMessageDialog(UploadWindow.this, "Upload done!", "Info",
-							JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 
