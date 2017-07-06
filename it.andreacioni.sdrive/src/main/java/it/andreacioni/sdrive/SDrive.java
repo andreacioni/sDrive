@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import it.andreacioni.commons.swing.ProgressCallback;
 import it.andreacioni.sdrive.archive.ArchiveService;
+import it.andreacioni.sdrive.archive.CompressionLevel;
 import it.andreacioni.sdrive.archive.Zip4jArchiveService;
 import it.andreacioni.sdrive.cloud.CloudServive;
 import it.andreacioni.sdrive.cloud.GoogleDriveCloudService;
@@ -51,6 +52,8 @@ public class SDrive {
 	public SDrive() {
 		cloudService = new GoogleDriveCloudService();
 		archiveService = new Zip4jArchiveService();
+
+		archiveService.setCompressionLevel(CompressionLevel.HIGH);
 	}
 
 	public boolean init() {

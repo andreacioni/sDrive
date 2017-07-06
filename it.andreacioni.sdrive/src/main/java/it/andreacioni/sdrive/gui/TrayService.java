@@ -109,7 +109,8 @@ public class TrayService implements Runnable {
 		if (sDrive.init()) {
 			if (check()) {
 				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+					UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+					// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				} catch (Exception e) {
 					LOG.error("Exception on initialization", e);
 				}

@@ -4,13 +4,28 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StrongThread {
-	private Runnable runnable;
+
+	private Logger LOG = LoggerFactory.getLogger(getClass());
+
+	private Thread runnable;
 	private Future<?> future;
 	private ExecutorService executorService;
 
 	public StrongThread(Runnable run) {
-		runnable = run;
+		runnable = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					run.run();
+				} catch (Throwable e) {
+					LOG.error("Thread {} died", Thread.currentThread().getName(), e);
+				}
+			}
+		});
 	}
 
 	public void start() {
@@ -33,7 +48,13 @@ public class StrongThread {
 		return future.isDone();
 	}
 
-	public void stop(boolean mayInterruptIfRunning) {
+	public synchronized void stop(boolean mayInterruptIfRunning) {
+
+		if (runnable != null) {
+			runnable.interrupt();
+			runnable = null;
+		}
+
 		if (future != null) {
 			future.cancel(mayInterruptIfRunning);
 			future = null;

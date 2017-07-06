@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -193,6 +195,7 @@ public class UploadWindow extends JFrame {
 								LOG.error("Failed print cause", e1);
 							}
 						} finally {
+							LOG.debug("Closing dialog");
 							progressDialog.closeDialog();
 						}
 
@@ -201,12 +204,15 @@ public class UploadWindow extends JFrame {
 
 				thread.start();
 
+				progressDialog.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent ev) {
+						LOG.debug("Cancelling operation...");
+						thread.stop();
+						LOG.warn("Operation cancelled");
+					}
+				});
 				progressDialog.showDialog();
-
-				if (progressDialog.isCancelled()) {
-					LOG.warn("Operation cancelled");
-					thread.stop();
-				}
 			}
 
 			private synchronized boolean prepareUpload() throws IOException {

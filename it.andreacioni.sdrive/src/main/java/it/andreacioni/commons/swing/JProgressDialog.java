@@ -1,8 +1,6 @@
 package it.andreacioni.commons.swing;
 
 import java.awt.BorderLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.concurrent.Semaphore;
 
 import javax.swing.BorderFactory;
@@ -59,10 +57,12 @@ public class JProgressDialog extends JDialog {
 	public void closeDialog() {
 		try {
 			semaphore.acquire();
+			semaphore.release();
 		} catch (InterruptedException e) {
 		}
 		setVisible(false);
 		dispose();
+
 	}
 
 	public void closeDialog(boolean res) {
@@ -87,14 +87,6 @@ public class JProgressDialog extends JDialog {
 		panel.add(progressBar, BorderLayout.PAGE_END);
 
 		add(panel);
-
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				cancelled = true;
-				closeDialog();
-			}
-		});
 	}
 
 }

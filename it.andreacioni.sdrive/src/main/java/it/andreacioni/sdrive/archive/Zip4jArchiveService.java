@@ -17,6 +17,13 @@ public class Zip4jArchiveService implements ArchiveService {
 
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
 
+	private CompressionLevel level = CompressionLevel.MEDIUM;
+
+	@Override
+	public void setCompressionLevel(CompressionLevel level) {
+		this.level = level;
+	}
+
 	@Override
 	public File compress(List<File> toBeCompressed, String toFilePath, String key) throws IOException {
 		LOG.info("Compressing files: {}, into: {}, with key", toBeCompressed, toFilePath, key);
@@ -27,7 +34,7 @@ public class Zip4jArchiveService implements ArchiveService {
 
 				ZipParameters parameters = new ZipParameters();
 				parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
-				parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+				parameters.setCompressionLevel(evaluateCompressionLevel());
 
 				if (key != null && !key.isEmpty()) {
 					Log.info("Key supplied, encryption enabled");
@@ -71,5 +78,18 @@ public class Zip4jArchiveService implements ArchiveService {
 			throw new IOException(e);
 		}
 
+	}
+
+	private int evaluateCompressionLevel() {
+		switch (level) {
+		case HIGH:
+			return Zip4jConstants.DEFLATE_LEVEL_ULTRA;
+		case MEDIUM:
+			return Zip4jConstants.DEFLATE_LEVEL_NORMAL;
+		case LOW:
+			return Zip4jConstants.DEFLATE_LEVEL_FASTEST;
+		default:
+			throw new IllegalStateException("Invalid level proposed: " + level);
+		}
 	}
 }
