@@ -251,7 +251,7 @@ public class UploadWindow extends JFrame {
 						} else {
 							JOptionPane.showMessageDialog(UploadWindow.this, "Two password doesn't match!", "Error",
 									JOptionPane.ERROR_MESSAGE);
-							askForFirstPassword();
+							ret = askForFirstPassword();
 						}
 					}
 				}
@@ -271,7 +271,7 @@ public class UploadWindow extends JFrame {
 				if (s == null || !s.isEmpty()) {
 					ret = s;
 				} else {
-					askForPassword(message);
+					ret = askForPassword(message);
 				}
 
 				return ret;
