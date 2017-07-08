@@ -27,3 +27,5 @@ sDrive-dd887235fa21.json
 
 #Maven
 taget/*
+taget/.gitignore
+dependency-reduced-pom.xml
