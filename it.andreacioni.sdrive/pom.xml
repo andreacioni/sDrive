@@ -67,7 +67,24 @@
 	    <version>4.12</version>
 	    <scope>test</scope>
 	</dependency>
-	
-  
   </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>it.andreacioni.sdrive.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+  		</plugin>
+  	</plugins>
+  </build>
 </project>

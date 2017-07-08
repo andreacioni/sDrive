@@ -60,9 +60,7 @@ public class TrayService implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!uploadWindow.isVisible()) {
-					uploadWindow.setVisible(true);
-					uploadWindow.requestFocus();
-					uploadWindow.toFront();
+					putOnTop();
 				} else
 					uploadWindow.setVisible(false);
 			}
@@ -73,9 +71,7 @@ public class TrayService implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!uploadWindow.isVisible()) {
-					uploadWindow.setVisible(true);
-					uploadWindow.requestFocus();
-					uploadWindow.toFront();
+					putOnTop();
 				} else
 					uploadWindow.setVisible(false);
 			}
@@ -119,6 +115,15 @@ public class TrayService implements Runnable {
 				System.err.println("SystemTray not supported");
 			}
 		}
+	}
+
+	private void putOnTop() {
+		uploadWindow.setVisible(true);
+		uploadWindow.setAlwaysOnTop(true);
+		uploadWindow.toFront();
+		uploadWindow.requestFocus();
+		uploadWindow.repaint();
+		uploadWindow.setAlwaysOnTop(false);
 	}
 
 }

@@ -24,3 +24,6 @@ hs_err_pid*
 #json (key file)
 client_secret.json
 sDrive-dd887235fa21.json
+
+#Maven
+taget/*
