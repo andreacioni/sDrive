@@ -1,2 +1,2 @@
 language: java
-script: cd it.andreacioni.sdrive && mvn package assembly:single
+script: cd it.andreacioni.sdrive && jdk_switcher use oraclejdk8 && mvn package assembly:single
