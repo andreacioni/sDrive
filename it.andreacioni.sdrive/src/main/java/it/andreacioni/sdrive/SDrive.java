@@ -52,8 +52,6 @@ public class SDrive {
 	public SDrive() {
 		cloudService = new GoogleDriveCloudService();
 		archiveService = new Zip4jArchiveService();
-
-		archiveService.setCompressionLevel(CompressionLevel.HIGH);
 	}
 
 	public boolean init() {
@@ -61,6 +59,7 @@ public class SDrive {
 		try {
 			ret = cloudService.connect();
 			accountName = cloudService.getAccountName();
+			archiveService.setCompressionLevel(CompressionLevel.HIGH);
 		} catch (IOException e) {
 			LOG.error("Exception connecting to cloud service");
 		}
