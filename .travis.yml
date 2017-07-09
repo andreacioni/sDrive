@@ -1,2 +1,2 @@
 language: java
-script: cd it.andreacioni.sdrive && mvn test -B
+script: cd it.andreacioni.sdrive && mvn package assembly:single
