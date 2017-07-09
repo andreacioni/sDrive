@@ -14,9 +14,9 @@ import javax.swing.UIManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.andreacioni.commons.utils.ImageUtils;
 import it.andreacioni.sdrive.ExitCodes;
 import it.andreacioni.sdrive.SDrive;
-import it.andreacioni.sdrive.utils.ImageUtils;
 
 public class TrayService implements Runnable {
 

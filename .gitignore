@@ -28,3 +28,5 @@ sDrive-dd887235fa21.json
 #Maven
 it.andreacioni.sdrive/target/**
 it.andreacioni.sdrive/dependency-reduced-pom.xml
+it.andreacioni.commons/target/**
+it.andreacioni.commons/dependency-reduced-pom.xml

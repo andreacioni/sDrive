@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 import it.andreacioni.commons.swing.JProgressDialog;
 import it.andreacioni.commons.swing.ProgressCallback;
 import it.andreacioni.commons.thread.StrongThread;
+import it.andreacioni.commons.utils.ExceptionUtils;
+import it.andreacioni.commons.utils.ImageUtils;
 import it.andreacioni.sdrive.SDrive;
-import it.andreacioni.sdrive.utils.ExceptionUtils;
-import it.andreacioni.sdrive.utils.ImageUtils;
 
 public class UploadWindow extends JFrame {
 

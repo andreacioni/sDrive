@@ -10,17 +10,19 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.andreacioni.commons.archive.ArchiveService;
+import it.andreacioni.commons.archive.CompressionLevel;
+import it.andreacioni.commons.archive.Zip4jArchiveService;
+import it.andreacioni.commons.cloud.CloudServive;
+import it.andreacioni.commons.cloud.GoogleDriveCloudService;
 import it.andreacioni.commons.swing.ProgressCallback;
-import it.andreacioni.sdrive.archive.ArchiveService;
-import it.andreacioni.sdrive.archive.CompressionLevel;
-import it.andreacioni.sdrive.archive.Zip4jArchiveService;
-import it.andreacioni.sdrive.cloud.CloudServive;
-import it.andreacioni.sdrive.cloud.GoogleDriveCloudService;
-import it.andreacioni.sdrive.utils.ResourceUtils;
+import it.andreacioni.commons.utils.ResourceUtils;
 
 public class SDrive {
 
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
+
+	private static final String APPLICATION_NAME = "Secure Drive";
 
 	/** Directory to store user credentials for this application. */
 	public static final File DATA_STORE_DIR = new File(System.getProperty("user.home"), ".sDrive");
@@ -50,7 +52,7 @@ public class SDrive {
 	private String accountName;
 
 	public SDrive() {
-		cloudService = new GoogleDriveCloudService();
+		cloudService = new GoogleDriveCloudService(DATA_STORE_DIR.getAbsolutePath(), APPLICATION_NAME);
 		archiveService = new Zip4jArchiveService();
 	}
 
