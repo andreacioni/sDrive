@@ -1,54 +1,117 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>it.andreacioni</groupId>
-  <artifactId>it.andreacioni.sdrive</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>sDrvie</name>
-  
-  <properties>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
-  </properties>
-  
-  <dependencies>
-  
-  	<dependency>
-	    <groupId>it.andreacioni</groupId>
-	    <artifactId>it.andreacioni.commons</artifactId>
-	    <version>0.0.1-SNAPSHOT</version>
-	</dependency>
-	
-	<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-	<dependency>
-	    <groupId>commons-io</groupId>
-	    <artifactId>commons-io</artifactId>
-	    <version>2.5</version>
-	</dependency>
-	
-  	<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-	<dependency>
-	    <groupId>ch.qos.logback</groupId>
-	    <artifactId>logback-classic</artifactId>
-	    <version>1.2.3</version>
-	</dependency>
-  </dependencies>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <manifest>
-              <mainClass>it.andreacioni.sdrive.Main</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-  		</plugin>
-  	</plugins>
-  </build>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>it.andreacioni</groupId>
+	<artifactId>it.andreacioni.sdrive</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>sDrive</name>
+
+	<properties>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>it.andreacioni</groupId>
+			<artifactId>it.andreacioni.commons</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Executable JAR -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>it.andreacioni.sdrive.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<!-- Mac OSX Package -->
+			<plugin>
+				<groupId>sh.tak.appbundler</groupId>
+				<artifactId>appbundle-maven-plugin</artifactId>
+				<version>1.2.0</version>
+				<configuration>
+					<mainClass>it.andreacioni.sdrive.Main</mainClass>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Windows Executable -->
+			<plugin>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>l4j-clui</id>
+						<phase>package</phase>
+						<goals>
+							<goal>launch4j</goal>
+						</goals>
+						<configuration>
+							<headerType>console</headerType>
+							<outfile>target/${project.name}.exe</outfile>
+							<jar>target/${project.build.finalName}.jar</jar>
+							<errTitle>${project.name}</errTitle>
+							<classPath>
+								<mainClass>it.andreacioni.sdrive.Main</mainClass>
+								<addDependencies>false</addDependencies>
+								<preCp>anything</preCp>
+							</classPath>
+							<jre>
+								<minVersion>1.8.0</minVersion>
+								<!--<opts>
+									<opt>-Djava.endorsed.dirs=./endorsed</opt>
+								</opts>-->
+							</jre>
+							<versionInfo>
+								<fileVersion>0.0.0.1</fileVersion>
+								<txtFileVersion>txt file version?</txtFileVersion>
+								<fileDescription>a description</fileDescription>
+								<copyright>my copyright</copyright>
+								<productVersion>0.0.0.1</productVersion>
+								<txtProductVersion>txt product version</txtProductVersion>
+								<productName>E-N-C-C</productName>
+								<internalName>${project.name}</internalName>
+								<originalFilename>${project.name}.exe</originalFilename>
+							</versionInfo>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
