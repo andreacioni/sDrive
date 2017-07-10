@@ -76,15 +76,15 @@
 				<artifactId>launch4j-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>l4j-clui</id>
+						<id>l4j-gui</id>
 						<phase>package</phase>
 						<goals>
 							<goal>launch4j</goal>
 						</goals>
 						<configuration>
-							<headerType>console</headerType>
+							<headerType>gui</headerType>
 							<outfile>target/${project.name}.exe</outfile>
-							<jar>target/${project.build.finalName}.jar</jar>
+							<jar>target/${project.build.finalName}-jar-with-dependencies.jar</jar>
 							<errTitle>${project.name}</errTitle>
 							<classPath>
 								<mainClass>it.andreacioni.sdrive.Main</mainClass>
@@ -93,14 +93,12 @@
 							</classPath>
 							<jre>
 								<minVersion>1.8.0</minVersion>
-								<!--<opts>
-									<opt>-Djava.endorsed.dirs=./endorsed</opt>
-								</opts>-->
+								<!--<opts> <opt>-Djava.endorsed.dirs=./endorsed</opt> </opts> -->
 							</jre>
 							<versionInfo>
 								<fileVersion>0.0.0.1</fileVersion>
 								<txtFileVersion>txt file version?</txtFileVersion>
-								<fileDescription>a description</fileDescription>
+								<fileDescription>sDrive Launcher</fileDescription>
 								<copyright>my copyright</copyright>
 								<productVersion>0.0.0.1</productVersion>
 								<txtProductVersion>txt product version</txtProductVersion>
