@@ -56,7 +56,7 @@ public class JProgressDialog extends JDialog {
 
 	public void closeDialog() {
 		try {
-			semaphore.acquire();
+			semaphore.acquire(semaphore.availablePermits());
 			semaphore.release();
 		} catch (InterruptedException e) {
 		}

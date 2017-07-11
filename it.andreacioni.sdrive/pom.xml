@@ -59,6 +59,8 @@
 				<version>1.2.0</version>
 				<configuration>
 					<mainClass>it.andreacioni.sdrive.Main</mainClass>
+					<iconFile>target/classes/icon.icns</iconFile>
+					<!--<generateDiskImageFile>true</generateDiskImageFile>  -->
 				</configuration>
 				<executions>
 					<execution>

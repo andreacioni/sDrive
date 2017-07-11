@@ -112,7 +112,7 @@ public class TrayService implements Runnable {
 				}
 				preparePopupMenu();
 			} else {
-				System.err.println("SystemTray not supported");
+				LOG.error("SystemTray not supported");
 			}
 		}
 	}
@@ -121,9 +121,8 @@ public class TrayService implements Runnable {
 		uploadWindow.setVisible(true);
 		uploadWindow.setAlwaysOnTop(true);
 		uploadWindow.toFront();
-		uploadWindow.requestFocus();
-		uploadWindow.repaint();
 		uploadWindow.setAlwaysOnTop(false);
+		uploadWindow.requestFocus();
 	}
 
 }

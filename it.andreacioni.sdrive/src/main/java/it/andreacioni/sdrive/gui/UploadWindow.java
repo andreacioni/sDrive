@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -169,7 +170,7 @@ public class UploadWindow extends JFrame {
 					@Override
 					public void run() {
 						try {
-							if (prepareUpload()) {
+							if (prepareUpload(progressDialog)) {
 								LOG.debug("Uploading files: {}", filesList);
 								sDrive.uploadFiles(filesList, new ProgressCallback<String>() {
 									@Override
@@ -178,17 +179,17 @@ public class UploadWindow extends JFrame {
 									}
 								});
 								LOG.info("Uploading done!");
-								JOptionPane.showMessageDialog(UploadWindow.this, "Upload done!", "Info",
+								JOptionPane.showMessageDialog(progressDialog, "Upload done!", "Info",
 										JOptionPane.INFORMATION_MESSAGE);
 							} else {
 								LOG.error("No password supplied, cannot upload");
-								JOptionPane.showMessageDialog(UploadWindow.this, "No password supplied, cannot upload",
+								JOptionPane.showMessageDialog(progressDialog, "No password supplied, cannot upload",
 										"Error", JOptionPane.ERROR_MESSAGE);
 							}
 						} catch (IOException e) {
 							LOG.error("Upload failed", e);
 							try {
-								JOptionPane.showMessageDialog(UploadWindow.this,
+								JOptionPane.showMessageDialog(progressDialog,
 										"Upload failed!\n" + ExceptionUtils.stackTraceToString(e), "Error",
 										JOptionPane.ERROR_MESSAGE);
 							} catch (IOException e1) {
@@ -215,7 +216,7 @@ public class UploadWindow extends JFrame {
 				progressDialog.showDialog();
 			}
 
-			private synchronized boolean prepareUpload() throws IOException {
+			private synchronized boolean prepareUpload(JDialog progressDialog) throws IOException {
 				boolean ret = false;
 				String s = null;
 
@@ -223,9 +224,9 @@ public class UploadWindow extends JFrame {
 					LOG.info("Insert password to unlock file");
 					if (sDrive.checkFirstStart()) {
 						LOG.info("First start password asking");
-						s = askForFirstPassword();
+						s = askForFirstPassword(progressDialog);
 					} else {
-						s = askForStdPassword();
+						s = askForStdPassword(progressDialog);
 					}
 
 					if (s != null) {
@@ -238,20 +239,20 @@ public class UploadWindow extends JFrame {
 				return ret;
 			}
 
-			private String askForFirstPassword() {
+			private String askForFirstPassword(JDialog progressDialog) {
 				String ret = null;
-				String s1 = askForPassword(
+				String s1 = askForPassword(progressDialog,
 						"Insert a password for secure archive. You MUST remember it unlock the archive!");
 				if (s1 != null) {
-					String s2 = askForPassword("Please re-type the previous password");
+					String s2 = askForPassword(progressDialog, "Please re-type the previous password");
 
 					if (s2 != null) {
 						if (s1.equals(s2)) {
 							ret = s1;
 						} else {
-							JOptionPane.showMessageDialog(UploadWindow.this, "Two password doesn't match!", "Error",
+							JOptionPane.showMessageDialog(progressDialog, "Two password doesn't match!", "Error",
 									JOptionPane.ERROR_MESSAGE);
-							ret = askForFirstPassword();
+							ret = askForFirstPassword(progressDialog);
 						}
 					}
 				}
@@ -259,19 +260,20 @@ public class UploadWindow extends JFrame {
 				return ret;
 			}
 
-			private String askForStdPassword() {
-				return askForPassword("What is the password of the secure archive? Please type it here below");
+			private String askForStdPassword(JDialog progressDialog) {
+				return askForPassword(progressDialog,
+						"What is the password of the secure archive? Please type it here below");
 			}
 
-			private String askForPassword(String message) {
+			private String askForPassword(JDialog progressDialog, String message) {
 				String ret = null;
-				String s = JOptionPane.showInputDialog(UploadWindow.this, message, "Insert password",
+				String s = JOptionPane.showInputDialog(progressDialog, message, "Insert password",
 						JOptionPane.QUESTION_MESSAGE);
 
 				if (s == null || !s.isEmpty()) {
 					ret = s;
 				} else {
-					ret = askForPassword(message);
+					ret = askForPassword(progressDialog, message);
 				}
 
 				return ret;
