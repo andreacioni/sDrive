@@ -53,39 +53,19 @@
 				</executions>
 			</plugin>
 
-			<!-- Mac OSX Package -->
-			<plugin>
-				<groupId>sh.tak.appbundler</groupId>
-				<artifactId>appbundle-maven-plugin</artifactId>
-				<version>1.2.0</version>
-				<configuration>
-					<mainClass>it.andreacioni.sdrive.Main</mainClass>
-					<iconFile>target/classes/icon.icns</iconFile>
-					<!--<generateDiskImageFile>true</generateDiskImageFile>  -->
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>bundle</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<!-- Windows Executable -->
 			<plugin>
 				<groupId>com.akathist.maven.plugins.launch4j</groupId>
 				<artifactId>launch4j-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>l4j-clui</id>
+						<id>l4j-gui</id>
 						<phase>package</phase>
 						<goals>
 							<goal>launch4j</goal>
 						</goals>
 						<configuration>
-							<headerType>console</headerType>
+							<headerType>gui</headerType>
 							<outfile>target/${project.name}.exe</outfile>
 							<jar>target/${project.build.finalName}-jar-with-dependencies.jar</jar>
 							<errTitle>${project.name}</errTitle>
@@ -110,6 +90,26 @@
 								<originalFilename>${project.name}.exe</originalFilename>
 							</versionInfo>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Mac OSX Package -->
+			<plugin>
+				<groupId>sh.tak.appbundler</groupId>
+				<artifactId>appbundle-maven-plugin</artifactId>
+				<version>1.2.0</version>
+				<configuration>
+					<mainClass>it.andreacioni.sdrive.Main</mainClass>
+					<iconFile>target/classes/icon.icns</iconFile>
+					<!--<generateDiskImageFile>true</generateDiskImageFile> -->
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
