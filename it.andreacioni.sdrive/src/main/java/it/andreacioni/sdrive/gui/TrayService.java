@@ -8,6 +8,7 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.UIManager;
 
@@ -48,10 +49,10 @@ public class TrayService implements Runnable {
 		return ret;
 	}
 
-	private void preparePopupMenu() {
+	private void preparePopupMenu() throws IOException {
 		popupMenu = new PopupMenu();
 
-		TrayIcon trayIcon = new TrayIcon(ImageUtils.createImage("icon.gif", "tray icon"));
+		TrayIcon trayIcon = ImageUtils.getScaledTrayIconImage("icon.png");
 		MenuItem uploadItem = new MenuItem("Upload...");
 		MenuItem aboutItem = new MenuItem("About");
 		MenuItem exitItem = new MenuItem("Exit");
@@ -106,11 +107,12 @@ public class TrayService implements Runnable {
 			if (check()) {
 				try {
 					UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+					preparePopupMenu();
 					// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				} catch (Exception e) {
 					LOG.error("Exception on initialization", e);
 				}
-				preparePopupMenu();
+
 			} else {
 				LOG.error("SystemTray not supported");
 			}

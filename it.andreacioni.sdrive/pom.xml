@@ -69,6 +69,7 @@
 							<outfile>target/${project.name}.exe</outfile>
 							<jar>target/${project.build.finalName}-jar-with-dependencies.jar</jar>
 							<errTitle>${project.name}</errTitle>
+							<icon>target/classes/icon.ico</icon>
 							<classPath>
 								<mainClass>it.andreacioni.sdrive.Main</mainClass>
 								<addDependencies>false</addDependencies>

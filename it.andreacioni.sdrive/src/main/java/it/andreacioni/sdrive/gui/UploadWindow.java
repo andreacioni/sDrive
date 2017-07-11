@@ -50,7 +50,7 @@ public class UploadWindow extends JFrame {
 	public UploadWindow(SDrive sDrive) {
 
 		setTitle("sDrive");
-		setIconImage(ImageUtils.createImage("icon.gif", "title icon"));
+		setIconImage(ImageUtils.createImage("icon.png"));
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		setSize(new Dimension(WIDTH, HEIGHT));
 		setMaximumSize(new Dimension(WIDTH, HEIGHT));
