@@ -52,7 +52,7 @@ public class TrayService implements Runnable {
 	private void preparePopupMenu() throws IOException {
 		popupMenu = new PopupMenu();
 
-		TrayIcon trayIcon = ImageUtils.getScaledTrayIconImage(ImageUtils.getBufferedImage("icon.png"));
+		TrayIcon trayIcon = ImageUtils.getScaledTrayIconImage(ImageUtils.createImage("icon.png"));
 
 		MenuItem uploadItem = new MenuItem("Upload...");
 		MenuItem aboutItem = new MenuItem("About");
