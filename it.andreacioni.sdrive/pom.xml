@@ -53,6 +53,27 @@
 				</executions>
 			</plugin>
 
+			<!-- Deb Package -->
+			<plugin>
+				<groupId>net.sf.debian-maven</groupId>
+				<artifactId>debian-maven-plugin</artifactId>
+				<version>1.0.6</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>package</goal>
+						</goals>
+						<configuration>
+							<packageName>${project.name}</packageName>
+							<packageVersion>1.0.0</packageVersion>
+							<packageDescription>${project.name} Launcher</packageDescription>
+						</configuration>
+					</execution>
+				</executions>
+
+			</plugin>
+
 			<!-- Windows Executable -->
 			<plugin>
 				<groupId>com.akathist.maven.plugins.launch4j</groupId>
