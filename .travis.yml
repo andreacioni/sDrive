@@ -5,5 +5,5 @@ group: stable
 sudo: required
 before_script:
   - sudo apt-get update
-  - sudo apt-get install libc6:i386 libstdc++6:i386
+  - sudo apt-get install libc6:i386 libstdc++6:i386 fakeroot
 script: jdk_switcher use oraclejdk8 && cd it.andreacioni.commons && mvn install -DskipTests && cd .. && cd it.andreacioni.sdrive && mvn package
