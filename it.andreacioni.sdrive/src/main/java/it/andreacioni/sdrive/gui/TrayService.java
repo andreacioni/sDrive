@@ -8,6 +8,7 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.UIManager;
 
@@ -48,10 +49,11 @@ public class TrayService implements Runnable {
 		return ret;
 	}
 
-	private void preparePopupMenu() {
+	private void preparePopupMenu() throws IOException {
 		popupMenu = new PopupMenu();
 
-		TrayIcon trayIcon = new TrayIcon(ImageUtils.createImage("icon.png"));
+		TrayIcon trayIcon = ImageUtils.getScaledTrayIconImage(ImageUtils.getBufferedImage("icon.png"));
+
 		MenuItem uploadItem = new MenuItem("Upload...");
 		MenuItem aboutItem = new MenuItem("About");
 		MenuItem exitItem = new MenuItem("Exit");

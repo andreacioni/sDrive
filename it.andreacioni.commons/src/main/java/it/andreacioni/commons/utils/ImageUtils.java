@@ -29,8 +29,7 @@ public class ImageUtils {
 		return ImageIO.read(imageURL);
 	}
 
-	public static TrayIcon getScaledTrayIconImage(String path) throws IOException {
-		BufferedImage trayIconImage = getBufferedImage(path);
+	public static TrayIcon getScaledTrayIconImage(Image trayIconImage) throws IOException {
 		int trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
 		return new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH));
 	}
