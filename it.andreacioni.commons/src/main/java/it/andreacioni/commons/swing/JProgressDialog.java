@@ -72,7 +72,7 @@ public class JProgressDialog extends JDialog {
 
 	private void createProgressUI(String text, boolean indeterminate) {
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		setSize(320, 70);
+		setSize(320, 80);
 		setModal(true);
 		setLocationRelativeTo(motherFrame);
 
