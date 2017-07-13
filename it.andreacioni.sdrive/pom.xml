@@ -126,7 +126,6 @@
 					<iconFile>target/classes/icon.icns</iconFile>
 					<jvmVersion>1.8+</jvmVersion>
 					<generateDiskImageFile>true</generateDiskImageFile>
-					<diskImageFile>target/sDrive.dmg</diskImageFile>
 				</configuration>
 				<executions>
 					<execution>
