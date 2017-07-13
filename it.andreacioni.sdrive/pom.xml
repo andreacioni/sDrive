@@ -124,8 +124,8 @@
 				<configuration>
 					<mainClass>it.andreacioni.sdrive.Main</mainClass>
 					<iconFile>target/classes/icon.icns</iconFile>
-					<diskImageFile>true</diskImageFile>
-					<!--<generateDiskImageFile>true</generateDiskImageFile> -->
+					<diskImageFile>target/sDrive.dmg</diskImageFile>
+					<generateDiskImageFile>true</generateDiskImageFile>
 				</configuration>
 				<executions>
 					<execution>
