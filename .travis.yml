@@ -8,9 +8,9 @@ before_script:
 - sudo apt-get update
 - sudo apt-get install libc6:i386 libstdc++6:i386 fakeroot
 script: cd it.andreacioni.commons && mvn install -DskipTests
-  && cd .. && cd it.andreacioni.sdrive && mvn package && mkdir ../build && cp target/it.andreacioni.sdrive-0.0.1-SNAPSHOT-jar-with-dependencies.jar ../build/sDrive.jar && cp target/sDrive.exe ../build/sDrive.exe
+  && cd .. && cd it.andreacioni.sdrive && mvn package && mkdir ../build && cp target/it.andreacioni.sdrive-0.0.1-SNAPSHOT-jar-with-dependencies.jar ../build/sDrive.jar && cp target/sDrive.exe ../build/sDrive.exe && cp target/sDrive.dmg ../build/sDrive.dmg
 
-before_deploy: "ls -l"
+before_deploy: "ls -l target"
 
 deploy:
   provider: releases
@@ -20,5 +20,6 @@ deploy:
   file: 
     - $TRAVIS_BUILD_DIR/build/sDrive.jar
     - $TRAVIS_BUILD_DIR/build/sDrive.exe
+    - $TRAVIS_BUILD_DIR/build/sDrive.dmg
   on:
     repo: andreacioni/sDrive
