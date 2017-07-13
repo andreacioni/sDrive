@@ -125,9 +125,7 @@
 					<mainClass>it.andreacioni.sdrive.Main</mainClass>
 					<iconFile>target/classes/icon.icns</iconFile>
 					<jvmVersion>1.8+</jvmVersion>
-					<version>${project.version}</version>
 					<generateDiskImageFile>true</generateDiskImageFile>
-					<javaLauncherName>sDrive</javaLauncherName>
 					<diskImageFile>target/sDrive.dmg</diskImageFile>
 				</configuration>
 				<executions>
