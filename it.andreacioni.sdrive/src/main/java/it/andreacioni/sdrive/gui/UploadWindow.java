@@ -240,10 +240,10 @@ public class UploadWindow extends JFrame {
 			}
 
 			private String askForFirstPassword(JDialog progressDialog) {
-				String ret = null;
-				String s1 = askForPassword(progressDialog,
-						"Insert a password for secure archive. You MUST remember it unlock the archive!");
-				if (s1 != null) {
+				String ret = null, s1 = null;
+				
+				while((s1 = askForPassword(progressDialog,
+						"Insert a password for secure archive. You MUST remember it unlock the archive!")) != null) {
 					String s2 = askForPassword(progressDialog, "Please re-type the previous password");
 
 					if (s2 != null) {
@@ -252,10 +252,11 @@ public class UploadWindow extends JFrame {
 						} else {
 							JOptionPane.showMessageDialog(progressDialog, "Two password doesn't match!", "Error",
 									JOptionPane.ERROR_MESSAGE);
-							ret = askForFirstPassword(progressDialog);
 						}
-					}
+					} else
+						break;
 				}
+				
 
 				return ret;
 			}
@@ -267,14 +268,10 @@ public class UploadWindow extends JFrame {
 
 			private String askForPassword(JDialog progressDialog, String message) {
 				String ret = null;
-				String s = JOptionPane.showInputDialog(progressDialog, message, "Insert password",
-						JOptionPane.QUESTION_MESSAGE);
-
-				if (s == null || !s.isEmpty()) {
-					ret = s;
-				} else {
-					ret = askForPassword(progressDialog, message);
-				}
+				
+				
+				while((ret = JOptionPane.showInputDialog(progressDialog, message, "Insert password",
+						JOptionPane.QUESTION_MESSAGE)) != null && ret.isEmpty());
 
 				return ret;
 			}

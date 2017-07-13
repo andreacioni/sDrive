@@ -264,10 +264,8 @@ public class GoogleDriveCloudService implements CloudServive {
 	public void setCredentialStoreDir(String path) {
 		if (path != null && !path.isEmpty()) {
 			File dir = new File(path);
-			if (!dir.isDirectory())
-				throw new IllegalArgumentException("Fail to set data store directory. Path is not a directory");
-			else
-				dataStoreDir = dir;
+			dataStoreDir = dir;
+				
 		} else
 			throw new IllegalArgumentException("Fail to set data store directory. Invalid directory");
 	}
