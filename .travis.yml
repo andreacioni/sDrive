@@ -7,14 +7,17 @@ before_script:
 - sudo apt-get update
 - sudo apt-get install libc6:i386 libstdc++6:i386 fakeroot
 script: jdk_switcher use oraclejdk8 && cd it.andreacioni.commons && mvn install -DskipTests
-  && cd .. && cd it.andreacioni.sdrive && mvn package
+  && cd .. && cd it.andreacioni.sdrive && mvn package && mkdir ../build && cp target/it.andreacioni.sdrive-0.0.1-SNAPSHOT-jar-with-dependencies.jar ../build/sDrive.jar && cp target/sDrive.exe ../build/sDrive.exe
+
+before_deploy: "ls -l"
+
 deploy:
   provider: releases
   skip_cleanup: true
   api_key:
     secure: dGnMaxllQZmDM8A+/3pVRHM8ozHVWgxyUZWd1nyuNsMyNgt8O+o6p4IqRu/oUbX1r9dz9wUFXGpOdRNO/uiMXKpAhq/CuhOknzu4qXJdoQRrQ1GUMQI11kheSeInFv7NYIv7heiFtv4wN0sox0LBplLc53vE1fHGCWDCQ4ikaS/ShN38N+OLc96Zcbbt+hphHtQn79wl0ohhR5z2n8X7/pmKs04qqw68y4yJJ9Fj5WnCshCqu/tWdKcW4CzRbt9cirHiiMMaYywpLh4eM+KAC0FmswqcYvQ+p6JFBD17qFp0WCUR2Q4lwq4nkyFlOFuXNVVgZhBA7gkccMXUo5OFp5SGOPIdVgY1uzksht+RNTQ8UipxsD7f9MqgZK0Q5LVsLEYxa0wDBtKqXdMcNfLZRtS/J4OGaWg6QQtbUYMyEL2ueRshRSRb4GyhDLs1MWUQfIofWdPbYIO1e5mNC1/oSSGnY6JzGEpE+bBenTExF+cqypHbhy5BTScdlqGaaP3b1pC2yjWiEP66a2YnZJSBWkx9ivbkJYSyI/J3Fiq1s+QiXBqGjOB+jESvCbd0PMMo5/KvnpGUuOOoxLHoqhM79ku81xshVtAsEoPM9JgGqD5q4qlo/gQvC0iCVxXop7tULk4LxoxWrWsY7noxuVscLepqOqV47KgONQV+kMtuGrk=
   file: 
-   - "it.andreacioni.sdrive/target/it.andreacioni.sdrive-0.0.1-SNAPSHOT-jar-with-dependencies.jar"
-   - "it.andreacioni.sdrive/target/sDrive.exe"
+   - "build/sDrive.jar"
+   - "build/sDrive.exe"
   on:
     repo: andreacioni/sDrive
