@@ -5,8 +5,9 @@ dist: precise
 group: stable
 sudo: required
 before_script:
-- sudo apt-get update
-- sudo apt-get install libc6:i386 libstdc++6:i386 fakeroot genisoimage
+    - sudo apt-get update
+    - sudo apt-get install libc6:i386 libstdc++6:i386 fakeroot genisoimage
+    - openssl aes-256-cbc -K $encrypted_2bc8eae37fec_key -iv $encrypted_2bc8eae37fec_iv -in client_secret.json.enc -out it.andreacioni.sdrive/src/main/resources/client_secret.json -d
 script: cd it.andreacioni.commons && mvn install -DskipTests
   && cd .. && cd it.andreacioni.sdrive && mvn package && mkdir ../build && cp target/it.andreacioni.sdrive-*-jar-with-dependencies.jar ../build/sDrive.jar && cp target/sDrive.exe ../build/sDrive.exe && cp target/it.andreacioni.sdrive-*.dmg ../build/sDrive.dmg
 
