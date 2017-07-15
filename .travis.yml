@@ -6,7 +6,7 @@ group: stable
 sudo: required
 before_script:
 - sudo apt-get update
-- sudo apt-get install libc6:i386 libstdc++6:i386 fakeroot
+- sudo apt-get install libc6:i386 libstdc++6:i386 fakeroot genisoimage
 script: cd it.andreacioni.commons && mvn install -DskipTests
   && cd .. && cd it.andreacioni.sdrive && mvn package && mkdir ../build && cp target/it.andreacioni.sdrive-*-jar-with-dependencies.jar ../build/sDrive.jar && cp target/sDrive.exe ../build/sDrive.exe && cp target/it.andreacioni.sdrive-*.dmg ../build/sDrive.dmg
 
