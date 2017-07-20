@@ -44,7 +44,7 @@ public class SDrive {
 
 	private final File PROPERTIES_FILE;
 
-	private SDrivePropertiesKey properties;
+	private SDriveProperties properties;
 
 	private CloudServive cloudService;
 
@@ -63,7 +63,7 @@ public class SDrive {
 		LOCAL_TEMP_DIR = new File(DATA_STORE_DIR, "tempdir");
 		PROPERTIES_FILE = new File(DATA_STORE_DIR, "sdrive.properties");
 
-		properties = new SDrivePropertiesKey();
+		properties = new SDriveProperties();
 		cloudService = new GoogleDriveCloudService(dataStoreDir.getAbsolutePath(), APPLICATION_NAME);
 		archiveService = new Zip4jArchiveService();
 	}
@@ -75,7 +75,7 @@ public class SDrive {
 			accountName = cloudService.getAccountName();
 			properties.load(PROPERTIES_FILE);
 			setCompressionLevel(CompressionLevel.valueOf(
-					properties.getValue(SDrivePropertiesKey.COMPRESSION_LEVEL_KEY, CompressionLevel.MEDIUM.name())));
+					properties.getValue(SDriveProperties.COMPRESSION_LEVEL_KEY, CompressionLevel.MEDIUM.name())));
 		} catch (IOException e) {
 			LOG.error("Exception connecting to cloud service");
 		}
@@ -97,7 +97,7 @@ public class SDrive {
 	public void setCompressionLevel(CompressionLevel level) {
 		LOG.info("Setting compression level to: {}", level);
 		archiveService.setCompressionLevel(level);
-		properties.setValue(SDrivePropertiesKey.COMPRESSION_LEVEL_KEY, level.toString());
+		properties.setValue(SDriveProperties.COMPRESSION_LEVEL_KEY, level.toString());
 		try {
 			properties.store();
 		} catch (IOException e) {
