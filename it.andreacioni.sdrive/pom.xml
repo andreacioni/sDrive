@@ -24,13 +24,6 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.2.3</version>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/commons-configuration/commons-configuration -->
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>1.10</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -131,7 +124,9 @@
 					<mainClass>it.andreacioni.sdrive.Main</mainClass>
 					<iconFile>target/classes/icon.icns</iconFile>
 					<jvmVersion>1.8+</jvmVersion>
-					<jvmOptions>-Dapple.awt.UIElement="true"</jvmOptions>
+					<jvmOptions>
+						<jvmOption>-Dapple.awt.UIElement="true"</jvmOption>
+					</jvmOptions>
 					<generateDiskImageFile>true</generateDiskImageFile>
 				</configuration>
 				<executions>

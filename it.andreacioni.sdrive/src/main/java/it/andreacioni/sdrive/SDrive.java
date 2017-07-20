@@ -24,14 +24,7 @@ public class SDrive {
 
 	private static final String APPLICATION_NAME = "Secure Drive";
 
-	/** Directory to store user credentials for this application. */
-	public static final File DATA_STORE_DIR = new File(System.getProperty("user.home"), ".sDrive");
-
 	public static final String ZIP_NAME = "sDrive.zip";
-
-	public static final File LOCAL_ARCHIVE = new File(DATA_STORE_DIR, ZIP_NAME);
-
-	public static final File LOCAL_TEMP_DIR = new File(DATA_STORE_DIR, "tempdir");
 
 	public static final String LOCAL_README_FILE_NAME = "README.txt";
 
@@ -43,6 +36,16 @@ public class SDrive {
 
 	public static final String REMOTE_ARCHIVE_PATH = REMOTE_SDRIVE_PATH + "/" + ZIP_NAME;
 
+	private final File DATA_STORE_DIR;
+
+	public final File LOCAL_ARCHIVE;
+
+	public final File LOCAL_TEMP_DIR;
+
+	private final File PROPERTIES_FILE;
+
+	private SDrivePropertiesKey properties;
+
 	private CloudServive cloudService;
 
 	private ArchiveService archiveService;
@@ -51,8 +54,17 @@ public class SDrive {
 
 	private String accountName;
 
-	public SDrive() {
-		cloudService = new GoogleDriveCloudService(DATA_STORE_DIR.getAbsolutePath(), APPLICATION_NAME);
+	public SDrive(File dataStoreDir) {
+		if (!dataStoreDir.isDirectory())
+			throw new IllegalArgumentException("Not a valid directory");
+
+		DATA_STORE_DIR = dataStoreDir;
+		LOCAL_ARCHIVE = new File(DATA_STORE_DIR, ZIP_NAME);
+		LOCAL_TEMP_DIR = new File(DATA_STORE_DIR, "tempdir");
+		PROPERTIES_FILE = new File(DATA_STORE_DIR, "sdrive.properties");
+
+		properties = new SDrivePropertiesKey();
+		cloudService = new GoogleDriveCloudService(dataStoreDir.getAbsolutePath(), APPLICATION_NAME);
 		archiveService = new Zip4jArchiveService();
 	}
 
@@ -61,7 +73,9 @@ public class SDrive {
 		try {
 			ret = cloudService.connect();
 			accountName = cloudService.getAccountName();
-			archiveService.setCompressionLevel(CompressionLevel.HIGH);
+			properties.load(PROPERTIES_FILE);
+			setCompressionLevel(CompressionLevel.valueOf(
+					properties.getValue(SDrivePropertiesKey.COMPRESSION_LEVEL_KEY, CompressionLevel.MEDIUM.name())));
 		} catch (IOException e) {
 			LOG.error("Exception connecting to cloud service");
 		}
@@ -74,6 +88,21 @@ public class SDrive {
 
 	public boolean checkFirstStart() throws IOException {
 		return !cloudService.fileExists(REMOTE_ARCHIVE_PATH);
+	}
+
+	public CompressionLevel getCompressionLevel() {
+		return archiveService.getCompressionLevel();
+	}
+
+	public void setCompressionLevel(CompressionLevel level) {
+		LOG.info("Setting compression level to: {}", level);
+		archiveService.setCompressionLevel(level);
+		properties.setValue(SDrivePropertiesKey.COMPRESSION_LEVEL_KEY, level.toString());
+		try {
+			properties.store();
+		} catch (IOException e) {
+			LOG.error("Storing properties fail", e);
+		}
 	}
 
 	public synchronized void setPassword(String psw) {

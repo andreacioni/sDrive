@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface ArchiveService {
 
+	public CompressionLevel getCompressionLevel();
+
 	public void setCompressionLevel(CompressionLevel level);
 
 	public File compress(List<File> toBeCompressed, String toFilePath, String key) throws IOException;

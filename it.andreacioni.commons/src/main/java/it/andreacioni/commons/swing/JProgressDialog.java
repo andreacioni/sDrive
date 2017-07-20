@@ -1,14 +1,16 @@
 package it.andreacioni.commons.swing;
 
-import java.awt.BorderLayout;
 import java.util.concurrent.Semaphore;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 public class JProgressDialog extends JDialog {
@@ -31,7 +33,7 @@ public class JProgressDialog extends JDialog {
 		motherFrame = frame;
 		semaphore = new Semaphore(0);
 		progressBar = new JProgressBar(min, max);
-		label = new JLabel();
+		label = new JLabel("", SwingConstants.LEFT);
 
 		createProgressUI(text, min == max);
 	}
@@ -72,21 +74,26 @@ public class JProgressDialog extends JDialog {
 
 	private void createProgressUI(String text, boolean indeterminate) {
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		setSize(320, 80);
 		setModal(true);
 		setLocationRelativeTo(motherFrame);
 
-		JPanel panel = new JPanel(new BorderLayout());
+		JPanel panel = new JPanel();
+		BoxLayout layout = new BoxLayout(panel, BoxLayout.PAGE_AXIS);
+		panel.setLayout(layout);
 		panel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+
 		if (text != null)
 			label.setText(text);
 
 		progressBar.setIndeterminate(indeterminate);
 
-		panel.add(label, BorderLayout.PAGE_START);
-		panel.add(progressBar, BorderLayout.PAGE_END);
+		panel.add(label);
+		panel.add(Box.createVerticalStrut(3));
+		panel.add(progressBar);
 
 		add(panel);
+
+		pack();
 	}
 
 }

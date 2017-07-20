@@ -20,6 +20,11 @@ public class Zip4jArchiveService implements ArchiveService {
 	private CompressionLevel level = CompressionLevel.MEDIUM;
 
 	@Override
+	public CompressionLevel getCompressionLevel() {
+		return level;
+	}
+
+	@Override
 	public void setCompressionLevel(CompressionLevel level) {
 		this.level = level;
 	}
