@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.slf4j.Logger;
@@ -76,6 +77,17 @@ public class TrayService implements Runnable {
 		MenuItem aboutItem = new MenuItem("About");
 		MenuItem exitItem = new MenuItem("Exit");
 
+		aboutItem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null,
+						"sDrive is an open source project hosted on GitHub.\nMore info here: https://github.com/andreacioni/sDrive",
+						"About", JOptionPane.INFORMATION_MESSAGE);
+
+			}
+		});
+
 		uploadItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -110,7 +122,7 @@ public class TrayService implements Runnable {
 		try {
 			systemTray.add(trayIcon);
 		} catch (AWTException e) {
-			e.printStackTrace();
+			LOG.error("Failed to add traycon to system tray", e);
 		}
 
 	}
