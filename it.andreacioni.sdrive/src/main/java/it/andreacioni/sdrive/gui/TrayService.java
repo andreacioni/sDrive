@@ -15,6 +15,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import org.slf4j.Logger;
@@ -25,6 +26,10 @@ import it.andreacioni.commons.utils.ImageUtils;
 import it.andreacioni.sdrive.ExitCodes;
 import it.andreacioni.sdrive.SDrive;
 
+/**
+ * @author andreacioni
+ *
+ */
 public class TrayService implements Runnable {
 
 	/** Directory to store user credentials for this application. */
@@ -74,10 +79,7 @@ public class TrayService implements Runnable {
 		uploadItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!uploadWindow.isVisible()) {
-					putOnTop();
-				} else
-					uploadWindow.setVisible(false);
+				putOnTop();
 			}
 		});
 
@@ -85,10 +87,7 @@ public class TrayService implements Runnable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!uploadWindow.isVisible()) {
-					putOnTop();
-				} else
-					uploadWindow.setVisible(false);
+				putOnTop();
 			}
 		});
 
@@ -199,12 +198,19 @@ public class TrayService implements Runnable {
 		sDrive.setCompressionLevel(compLev);
 	}
 
+	/**
+	 * This solution is the only that work on OSX. It was found here:
+	 * https://stackoverflow.com/questions/309023/how-to-bring-a-window-to-the-front
+	 */
 	private void putOnTop() {
 		uploadWindow.setVisible(true);
+		int state = uploadWindow.getExtendedState();
+		state &= ~JFrame.ICONIFIED;
+		uploadWindow.setExtendedState(state);
 		uploadWindow.setAlwaysOnTop(true);
 		uploadWindow.toFront();
-		uploadWindow.setAlwaysOnTop(false);
 		uploadWindow.requestFocus();
+		uploadWindow.setAlwaysOnTop(false);
 	}
 
 }
