@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>it.andreacioni</groupId>
 	<artifactId>it.andreacioni.sdrive</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>sDrive</name>
 
 	<properties>
@@ -65,7 +65,7 @@
 						</goals>
 						<configuration>
 							<packageName>${project.name}</packageName>
-							<packageVersion>1.0.0</packageVersion>
+							<packageVersion>${project.version}</packageVersion>
 							<packageDescription>${project.name} Launcher</packageDescription>
 						</configuration>
 					</execution>
@@ -99,17 +99,6 @@
 								<minVersion>1.8.0</minVersion>
 								<!--<opts> <opt>-Djava.endorsed.dirs=./endorsed</opt> </opts> -->
 							</jre>
-							<versionInfo>
-								<fileVersion>0.0.0.1</fileVersion>
-								<txtFileVersion>txt file version?</txtFileVersion>
-								<fileDescription>sDrive Launcher</fileDescription>
-								<copyright>my copyright</copyright>
-								<productVersion>0.0.0.1</productVersion>
-								<txtProductVersion>txt product version</txtProductVersion>
-								<productName>E-N-C-C</productName>
-								<internalName>${project.name}</internalName>
-								<originalFilename>${project.name}.exe</originalFilename>
-							</versionInfo>
 						</configuration>
 					</execution>
 				</executions>
