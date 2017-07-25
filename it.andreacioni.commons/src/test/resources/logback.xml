@@ -2,7 +2,7 @@
 <configuration>
 
 	<appender name="POPUP"
-		class="it.andreacioni.commons.logging.appender.PopupAppender">
+		class="it.andreacioni.commons.logging.appender.SwingPopupAppender">
 		<encoder>
 			<pattern>%msg%n%throwable{10}%n</pattern>
 		</encoder>

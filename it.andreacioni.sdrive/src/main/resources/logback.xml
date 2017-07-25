@@ -9,17 +9,17 @@
 	</appender>
 
 	<appender name="POPUP"
-		class="it.andreacioni.commons.logging.appender.PopupAppender">
+		class="it.andreacioni.commons.logging.appender.SwingPopupAppender">
 		<encoder>
 			<Pattern>%msg%n%ex{10}%n</Pattern>
 		</encoder>
 	</appender>
+	
+	<logger name="it.andreacioni.sdrive" level="error">
+		<appender-ref ref="POPUP" />
+	</logger>
 
 	<root level="debug">
 		<appender-ref ref="STDOUT" />
-	</root>
-	
-	<root level="error">
-		<appender-ref ref="POPUP" />
 	</root>
 </configuration>
