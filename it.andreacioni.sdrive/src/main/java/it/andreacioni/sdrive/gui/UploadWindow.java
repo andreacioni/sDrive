@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import it.andreacioni.commons.swing.JProgressDialog;
 import it.andreacioni.commons.swing.ProgressCallback;
 import it.andreacioni.commons.thread.StrongThread;
-import it.andreacioni.commons.utils.ExceptionUtils;
 import it.andreacioni.commons.utils.ImageUtils;
 import it.andreacioni.sdrive.SDrive;
 
@@ -77,9 +76,21 @@ public class UploadWindow extends JFrame {
 		public UploadPanel(SDrive sDrive) {
 			this.sDrive = sDrive;
 			setLayout(new BorderLayout());
-			setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+			setBorder(BorderFactory.createEmptyBorder(2, 10, 10, 10));
+			add(new TopInfoPanel(), BorderLayout.PAGE_START);
 			add(new BottomInfoPanel(), BorderLayout.PAGE_END);
 			add(new DragAndDropAreaPanel(), BorderLayout.CENTER);
+		}
+
+		public class TopInfoPanel extends JPanel {
+
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = -8488193495376279656L;
+
+			public TopInfoPanel() {
+			}
 		}
 
 		private class BottomInfoPanel extends JPanel {
@@ -192,13 +203,7 @@ public class UploadWindow extends JFrame {
 							}
 						} catch (IOException e) {
 							LOG.error("Upload failed", e);
-							try {
-								JOptionPane.showMessageDialog(progressDialog,
-										"Upload failed!\n" + ExceptionUtils.stackTraceToString(e), "Error",
-										JOptionPane.ERROR_MESSAGE);
-							} catch (IOException e1) {
-								LOG.error("Failed print cause", e1);
-							}
+
 						} finally {
 							LOG.debug("Closing dialog");
 							progressDialog.closeDialog();

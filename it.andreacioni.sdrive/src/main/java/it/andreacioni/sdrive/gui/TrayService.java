@@ -74,8 +74,11 @@ public class TrayService implements Runnable {
 		TrayIcon trayIcon = ImageUtils.getScaledTrayIconImage(ImageUtils.createImage("icon.png"));
 
 		MenuItem uploadItem = new MenuItem("Upload...");
+		MenuItem usernameItem = new MenuItem(sDrive.getAccountName());
 		MenuItem aboutItem = new MenuItem("About");
 		MenuItem exitItem = new MenuItem("Exit");
+
+		usernameItem.setEnabled(false);
 
 		aboutItem.addActionListener(new ActionListener() {
 
@@ -113,6 +116,7 @@ public class TrayService implements Runnable {
 		popupMenu.add(uploadItem);
 		popupMenu.add(prepareCompressionLevelMenu());
 		popupMenu.addSeparator();
+		popupMenu.add(usernameItem);
 		popupMenu.add(aboutItem);
 		popupMenu.add(exitItem);
 
@@ -129,20 +133,22 @@ public class TrayService implements Runnable {
 
 	@Override
 	public void run() {
-		if (sDrive.init()) {
-			if (check()) {
-				try {
+		try {
+			if (sDrive.init()) {
+				if (check()) {
+					// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 					preparePopupMenu();
-					// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				} catch (Exception e) {
-					LOG.error("Exception on initialization", e);
-				}
 
-			} else {
-				LOG.error("SystemTray not supported");
+				} else {
+					LOG.error("SystemTray not supported");
+				}
 			}
+
+		} catch (Exception e) {
+			LOG.error("Exception on initialization", e);
 		}
+
 	}
 
 	private Menu prepareCompressionLevelMenu() {
@@ -207,7 +213,11 @@ public class TrayService implements Runnable {
 	}
 
 	private void saveCompressionLevel(CompressionLevel compLev) {
-		sDrive.setCompressionLevel(compLev);
+		try {
+			sDrive.setCompressionLevel(compLev);
+		} catch (IOException e) {
+			LOG.error("Failed setting compression level", e);
+		}
 	}
 
 	/**

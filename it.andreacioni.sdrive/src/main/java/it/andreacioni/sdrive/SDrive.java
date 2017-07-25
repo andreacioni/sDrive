@@ -68,7 +68,7 @@ public class SDrive {
 		archiveService = new Zip4jArchiveService();
 	}
 
-	public boolean init() {
+	public boolean init() throws IOException {
 		boolean ret = false;
 		try {
 			ret = cloudService.connect();
@@ -77,7 +77,7 @@ public class SDrive {
 			setCompressionLevel(CompressionLevel.valueOf(
 					properties.getValue(SDriveProperties.COMPRESSION_LEVEL_KEY, CompressionLevel.MEDIUM.name())));
 		} catch (IOException e) {
-			LOG.error("Exception connecting to cloud service");
+			throw new IOException("Exception connecting to cloud service");
 		}
 		return ret;
 	}
@@ -94,14 +94,14 @@ public class SDrive {
 		return archiveService.getCompressionLevel();
 	}
 
-	public void setCompressionLevel(CompressionLevel level) {
+	public void setCompressionLevel(CompressionLevel level) throws IOException {
 		LOG.info("Setting compression level to: {}", level);
 		archiveService.setCompressionLevel(level);
 		properties.setValue(SDriveProperties.COMPRESSION_LEVEL_KEY, level.toString());
 		try {
 			properties.store();
 		} catch (IOException e) {
-			LOG.error("Storing properties fail", e);
+			throw new IOException("Storing properties fail", e);
 		}
 	}
 
@@ -186,7 +186,7 @@ public class SDrive {
 			updateProgress("Uploading...", progressCallback);
 			ret = uploadRemoteArchive();
 		} else {
-			LOG.error("Cannot compress that files");
+			throw new IOException("Cannot compress that files");
 		}
 
 		return ret;
@@ -220,7 +220,6 @@ public class SDrive {
 					masterPassword);
 			return true;
 		} catch (IOException e) {
-			LOG.error("", e);
 			return false;
 		}
 	}
@@ -243,14 +242,14 @@ public class SDrive {
 				|| (cloudService.upload(ResourceUtils.asFile(LOCAL_README_FILE_NAME), REMOTE_SDRIVE_PATH)));
 	}
 
-	private boolean clearTempFileAndDirectory() {
+	private boolean clearTempFileAndDirectory() throws IOException {
 		boolean ret = false;
 		try {
 			removeTempDirectory();
 			removeZipFileIfExists();
 			ret = true;
 		} catch (IOException e) {
-			LOG.error("Failed to delete temp files");
+			throw new IOException("Failed to delete temp files");
 		}
 		return ret;
 	}
