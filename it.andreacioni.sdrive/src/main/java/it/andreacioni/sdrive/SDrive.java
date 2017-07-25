@@ -105,6 +105,15 @@ public class SDrive {
 		}
 	}
 
+	public synchronized void unzipToDir(String directoryPath) throws IOException {
+		LOG.debug("Uncompressing dowloaded zip file to: {}", directoryPath);
+		File f = new File(directoryPath);
+		if (f.isDirectory()) {
+			archiveService.uncompress(LOCAL_ARCHIVE.getAbsolutePath(), f.getAbsolutePath(), masterPassword);
+		} else
+			throw new IllegalArgumentException("Not a valid directory");
+	}
+
 	public synchronized void setPassword(String psw) {
 		masterPassword = psw;
 	}
@@ -214,10 +223,8 @@ public class SDrive {
 	}
 
 	private boolean unzipArchiveToTempDir() {
-		LOG.debug("Uncompressing dowloaded zip file");
 		try {
-			archiveService.uncompress(LOCAL_ARCHIVE.getAbsolutePath(), LOCAL_TEMP_DIR.getAbsolutePath(),
-					masterPassword);
+			unzipToDir(LOCAL_TEMP_DIR.getAbsolutePath());
 			return true;
 		} catch (IOException e) {
 			return false;
