@@ -25,6 +25,9 @@ hs_err_pid*
 client_secret.json
 sDrive-dd887235fa21.json
 
+#credential
+StoredCredential
+
 #Maven
 it.andreacioni.sdrive/target/**
 it.andreacioni.sdrive/dependency-reduced-pom.xml
