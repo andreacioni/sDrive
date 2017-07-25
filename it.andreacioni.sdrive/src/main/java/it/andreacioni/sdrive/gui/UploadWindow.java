@@ -198,8 +198,6 @@ public class UploadWindow extends JFrame {
 										JOptionPane.INFORMATION_MESSAGE);
 							} else {
 								LOG.error("No password supplied, cannot upload");
-								JOptionPane.showMessageDialog(progressDialog, "No password supplied, cannot upload",
-										"Error", JOptionPane.ERROR_MESSAGE);
 							}
 						} catch (IOException e) {
 							LOG.error("Upload failed", e);
@@ -294,7 +292,7 @@ public class UploadWindow extends JFrame {
 				panel.add(pass);
 				String[] options = new String[] { "OK", "Cancel" };
 				int option = JOptionPane.showOptionDialog(progressDialog, panel, "Insert password",
-						JOptionPane.NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+						JOptionPane.NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
 
 				if (option == 0) {
 					ret = new String(pass.getPassword());
