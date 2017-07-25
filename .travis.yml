@@ -26,3 +26,4 @@ deploy:
 #   - $TRAVIS_BUILD_DIR/build/sDrive.deb
   on:
     repo: andreacioni/sDrive
+    tags: true
