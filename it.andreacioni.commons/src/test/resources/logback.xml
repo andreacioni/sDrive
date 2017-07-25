@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="POPUP"
+		class="it.andreacioni.commons.logging.appender.PopupAppender">
+		<encoder>
+			<pattern>%msg%n%throwable{10}%n</pattern>
+		</encoder>
+	</appender>
+
+
+	<root level="trace">
+		<appender-ref ref="POPUP" />
+	</root>
+</configuration>
