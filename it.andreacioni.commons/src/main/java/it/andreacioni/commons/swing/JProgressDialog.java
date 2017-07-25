@@ -24,6 +24,8 @@ public class JProgressDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = -1987000903605227613L;
 
+	private static final int PROGRESS_DIALOG_WIDTH = 380;
+
 	private JProgressBar progressBar;
 	private JFrame motherFrame;
 	private JLabel label;
@@ -99,9 +101,9 @@ public class JProgressDialog extends JDialog {
 
 		pack();
 
-		setSize(new Dimension(380, getHeight()));
-		setPreferredSize(new Dimension(380, getHeight()));
-		setMaximumSize(new Dimension(380, getHeight()));
+		setSize(new Dimension(PROGRESS_DIALOG_WIDTH, getHeight()));
+		setPreferredSize(new Dimension(PROGRESS_DIALOG_WIDTH, getHeight()));
+		setMaximumSize(new Dimension(PROGRESS_DIALOG_WIDTH, getHeight()));
 	}
 
 	private GridBagConstraints createConstraints(int ylevel) {

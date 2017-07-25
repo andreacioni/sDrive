@@ -42,8 +42,6 @@ public class UploadWindow extends JFrame {
 
 	private static final Color DD_COLOR = new Color(154, 154, 154);
 
-	private static final int PROGRESS_DIALOG_WIDTH = 380;
-
 	private static final int WIDTH = 400;
 
 	private static final int HEIGHT = 400;
@@ -212,7 +210,6 @@ public class UploadWindow extends JFrame {
 
 				thread.start();
 
-				progressDialog.setSize(PROGRESS_DIALOG_WIDTH, progressDialog.getHeight());
 				progressDialog.addWindowListener(new WindowAdapter() {
 					@Override
 					public void windowClosing(WindowEvent ev) {
