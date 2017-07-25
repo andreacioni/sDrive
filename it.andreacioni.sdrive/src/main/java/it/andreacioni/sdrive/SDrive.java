@@ -55,7 +55,7 @@ public class SDrive {
 	private String accountName;
 
 	public SDrive(File dataStoreDir) {
-		if (!dataStoreDir.isDirectory())
+		if (!dataStoreDir.isDirectory() && !dataStoreDir.mkdirs())
 			throw new IllegalArgumentException("Not a valid directory");
 
 		DATA_STORE_DIR = dataStoreDir;
