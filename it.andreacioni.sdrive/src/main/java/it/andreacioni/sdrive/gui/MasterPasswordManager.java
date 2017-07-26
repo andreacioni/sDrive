@@ -27,6 +27,12 @@ public class MasterPasswordManager {
 		this.sDrive = sDrive;
 	}
 
+	public MasterPasswordManager(SDrive sDrive, boolean reset) {
+		this.sDrive = sDrive;
+		if (reset)
+			sDrive.setPassword(null);
+	}
+
 	public boolean prepareUpload(JDialog progressDialog) throws IOException {
 		boolean ret = false;
 		String s = null;

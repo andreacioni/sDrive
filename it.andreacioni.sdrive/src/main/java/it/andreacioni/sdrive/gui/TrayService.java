@@ -198,7 +198,7 @@ public class TrayService implements Runnable {
 	}
 
 	private boolean prepare(JProgressDialog progressDialog) throws IOException {
-		return new MasterPasswordManager(sDrive).prepareUpload(progressDialog);
+		return new MasterPasswordManager(sDrive, true).prepareUpload(progressDialog);
 	}
 
 	@Override
