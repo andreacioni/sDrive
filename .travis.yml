@@ -1,7 +1,7 @@
 language: java
 jdk: oraclejdk8
 os: linux
-dist: precise
+#dist: precise ---- no need to stay on this particular distro
 group: stable
 sudo: required
 before_script:
