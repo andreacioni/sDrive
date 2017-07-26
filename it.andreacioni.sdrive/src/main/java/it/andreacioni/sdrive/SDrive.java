@@ -105,15 +105,6 @@ public class SDrive {
 		}
 	}
 
-	public synchronized void unzipToDir(String directoryPath) throws IOException {
-		LOG.debug("Uncompressing dowloaded zip file to: {}", directoryPath);
-		File f = new File(directoryPath);
-		if (f.isDirectory()) {
-			archiveService.uncompress(LOCAL_ARCHIVE.getAbsolutePath(), f.getAbsolutePath(), masterPassword);
-		} else
-			throw new IllegalArgumentException("Not a valid directory");
-	}
-
 	public synchronized void setPassword(String psw) {
 		masterPassword = psw;
 	}
@@ -128,48 +119,88 @@ public class SDrive {
 
 	public synchronized void uploadFiles(List<File> files, ProgressCallback<String> progressCallback)
 			throws IOException {
+		LOG.info("Uploadign files: {}", files);
 		if (files != null && files.size() != 0) {
-			updateProgress("Checking password loaded...", progressCallback);
-			if (isPasswordLoaded()) {
-				updateProgress("Clearing temp directory...", progressCallback);
-				if (clearTempFileAndDirectory()) {
-					updateProgress("Creating temp directory...", progressCallback);
-					if (LOCAL_TEMP_DIR.mkdir()) {
-						boolean fisrtStart = checkFirstStart();
-						if (!fisrtStart) {
-							LOG.debug("Not first start, archive file is present on remote");
-							updateProgress("Downloading remote archive...", progressCallback);
-							if (downloadRemoteArchive()) {
-								LOG.debug("Download done!");
-
-								updateProgress("Uncompressing remote archive locally...", progressCallback);
-								if (unzipArchiveToTempDir()) {
-									LOG.debug("Unzip done!");
-									copyToTempAndUpload(files, fisrtStart, progressCallback);
-								} else {
-									setPassword(null);
-									throw new IOException("Failed to unzip archive. Wrong password?");
-								}
-							} else {
-								throw new IOException("Failed to download archive");
-							}
-
-						} else {
-							LOG.warn("First start");
-							copyToTempAndUpload(files, fisrtStart, progressCallback);
-						}
-					} else {
-						throw new IOException("Cannot create temp folder");
-					}
-				} else {
-					throw new IOException("Cannot delete local archive");
-				}
-			} else
-				throw new RuntimeException("Master password not set yet");
-
+			boolean firstStart = downloadAndUnzip(LOCAL_TEMP_DIR, progressCallback);
+			copyToTempAndUpload(files, firstStart, progressCallback);
 		} else
 			throw new IllegalArgumentException("Invalid file list");
 
+	}
+
+	public synchronized void extractFiles(String toDir, ProgressCallback<String> progressCallback) throws IOException {
+		if (!checkFirstStart()) {
+			File f = new File(toDir);
+			if (f.isDirectory()) {
+				f = it.andreacioni.commons.utils.FileUtils.generateNonConflictDirectoryName(new File(f, "sDrive"));
+				LOG.debug("Extracting files to {}", f.getAbsolutePath());
+				if (f.mkdir()) {
+					try {
+						downloadAndUnzip(f, progressCallback);
+					} catch (IOException e) {
+						f.delete();
+						throw e;
+					}
+				} else
+					throw new IOException("Cannot create directory: " + f.getName());
+			} else
+				throw new IllegalArgumentException("Not a valid directory");
+		} else
+			throw new IllegalStateException("No archive can be dowloaded from cloud");
+	}
+
+	private boolean unzipToDir(String directoryPath) {
+		LOG.debug("Uncompressing dowloaded zip file to: {}", directoryPath);
+		File f = new File(directoryPath);
+		if (f.isDirectory()) {
+			try {
+				archiveService.uncompress(LOCAL_ARCHIVE.getAbsolutePath(), f.getAbsolutePath(), masterPassword);
+				return true;
+			} catch (IOException e) {
+				return false;
+			}
+		} else
+			throw new IllegalArgumentException("Not a valid directory");
+	}
+
+	private boolean downloadAndUnzip(File directory, ProgressCallback<String> progressCallback) throws IOException {
+		updateProgress("Checking password loaded...", progressCallback);
+		if (isPasswordLoaded()) {
+			updateProgress("Clearing temp directory...", progressCallback);
+			if (clearTempFileAndDirectory()) {
+				updateProgress("Creating temp directory...", progressCallback);
+				if (LOCAL_TEMP_DIR.mkdir()) {
+					boolean fisrtStart = checkFirstStart();
+					if (!fisrtStart) {
+						LOG.debug("Not first start, archive file is present on remote");
+						updateProgress("Downloading remote archive...", progressCallback);
+						if (downloadRemoteArchive()) {
+							LOG.debug("Download done!");
+
+							updateProgress("Uncompressing remote archive locally...", progressCallback);
+							if (unzipToDir(directory.getAbsolutePath())) {
+								LOG.debug("Unzip done!");
+							} else {
+								setPassword(null);
+								throw new IOException("Failed to unzip archive. Wrong password?");
+							}
+						} else {
+							throw new IOException("Failed to download archive");
+						}
+
+					} else {
+						LOG.warn("First start");
+					}
+
+					return fisrtStart;
+				} else {
+					throw new IOException("Cannot create temp folder");
+				}
+			} else {
+				throw new IOException("Cannot delete local archive");
+			}
+		} else
+			throw new RuntimeException("Master password not set yet");
 	}
 
 	private void updateProgress(String newState, ProgressCallback<String> progressCallback) {
@@ -177,9 +208,8 @@ public class SDrive {
 			progressCallback.progressUpdate(newState);
 	}
 
-	private boolean copyToTempAndUpload(List<File> files, boolean firstStart, ProgressCallback<String> progressCallback)
+	private void copyToTempAndUpload(List<File> files, boolean firstStart, ProgressCallback<String> progressCallback)
 			throws IOException {
-		boolean ret = false;
 		copyNewFileToTempDir(files);
 
 		if (!firstStart) {
@@ -193,12 +223,12 @@ public class SDrive {
 			LOG.debug("Zip done!");
 			createRemoteDirIfNotExists();
 			updateProgress("Uploading...", progressCallback);
-			ret = uploadRemoteArchive();
+			if (!uploadRemoteArchive())
+				throw new IOException("File not uploaded correctly");
+
 		} else {
 			throw new IOException("Cannot compress that files");
 		}
-
-		return ret;
 	}
 
 	private void createRemoteDirIfNotExists() throws IOException {
@@ -219,15 +249,6 @@ public class SDrive {
 			} else
 				throw new FileNotFoundException();
 
-		}
-	}
-
-	private boolean unzipArchiveToTempDir() {
-		try {
-			unzipToDir(LOCAL_TEMP_DIR.getAbsolutePath());
-			return true;
-		} catch (IOException e) {
-			return false;
 		}
 	}
 

@@ -8,6 +8,24 @@ import java.util.List;
 
 public class FileUtils {
 
+	public static File generateNonConflictDirectoryName(File f) {
+		File ret = null;
+		int i = 1;
+		if (f == null)
+			throw new IllegalArgumentException("Null file passed");
+
+		if (!f.exists())
+			ret = f;
+		else {
+			do {
+				ret = new File(f.getPath() + "(" + i + ")");
+				i++;
+			} while (ret.exists());
+		}
+
+		return ret;
+	}
+
 	public static File generateNonConflictFileName(File f) {
 		File ret = null;
 		String s;
